@@ -317,6 +317,30 @@
         .lp-card.kinder .go { background: #ff8a5b; }
         .lp-card.elem .go { background: #4a7dff; }
 
+        /* 기록 날짜 막대 */
+        .date-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 16px; background: var(--card); border-bottom: 2px solid var(--line); }
+        .date-bar .label { font-weight: 800; }
+        .date-bar .field { width: auto; min-height: 40px; padding: 6px 10px; }
+        .date-bar .past { font-weight: 800; color: #fff; background: var(--yellow); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+        .date-bar .past.future { background: var(--blue); }
+
+        /* 하루 기록 */
+        .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+        .day-card h3 { margin: 0 0 10px; font-size: 17px; display: flex; align-items: center; gap: 6px; }
+        .day-card h3 .cnt { margin-left: auto; color: var(--muted); font-size: 14px; }
+        .day-card ul { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .day-card li { background: var(--bg); border-radius: 10px; padding: 7px 10px; font-size: 15px; word-break: keep-all; }
+        .day-card li .time { color: var(--muted); font-size: 13px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+        .day-card .none { color: var(--muted); font-size: 14px; }
+        .day-dates { display: flex; flex-wrap: wrap; gap: 6px; }
+        .day-dates button.on { background: var(--primary); color: #fff; }
+        @media print {
+            header, nav, .date-bar, .no-print, .toast { display: none !important; }
+            body { background: #fff; display: block; }
+            main { overflow: visible; padding: 0; }
+            .card, .day-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+        }
+
         /* 코딩 길찾기 */
         .code-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
         .maze { display: grid; gap: 4px; width: min(100%, 440px); margin: 0 auto; }
@@ -412,14 +436,25 @@
     <button data-tab="roles" data-e>🧹 1인 1역</button>
     <button data-tab="observe"><span data-k>📝 관찰·알림장</span><span data-e>📝 생활 기록·알림장</span></button>
     <button data-tab="steam"><span data-k>🧪 STEAM 놀이</span><span data-e>🧪 STEAM 탐구</span></button>
+    <button data-tab="daylog">📅 하루 기록</button>
     <button data-tab="settings">⚙️ 우리 반 설정</button>
 </nav>
+
+<div class="date-bar">
+    <span class="label">📅 기록 날짜</span>
+    <button class="btn small" id="btn-day-prev" title="전날">◀</button>
+    <input type="date" id="view-date" class="field">
+    <button class="btn small" id="btn-day-next" title="다음 날">▶</button>
+    <button class="btn small" id="btn-day-today">오늘로</button>
+    <span class="past" id="past-note" hidden></span>
+    <span class="hint">고른 날짜에 한 활동이 모두 그날 기록으로 저장되고, 날짜를 다시 고르면 그대로 다시 보여요.</span>
+</div>
 
 <main>
     <!-- 출석 -->
     <section class="panel active" id="panel-attendance">
         <div class="row" style="margin-bottom:12px">
-            <input type="date" id="att-date" class="field" style="width:auto">
+            <input type="date" id="att-date" class="field" style="width:auto" hidden>
             <span class="hint">카드를 누르면 확인 전 → <span data-k>등원</span><span data-e>출석</span> → 결석 순서로 바뀌어요.</span>
             <span class="spacer"></span>
             <button class="btn green" id="btn-all-present"><span data-k>모두 등원</span><span data-e>모두 출석</span></button>
@@ -592,7 +627,7 @@
                 <div class="card stack">
                     <h3 class="section-title" style="margin:0"><span data-k>관찰 기록 쓰기</span><span data-e>생활 기록 쓰기</span></h3>
                     <div class="row">
-                        <input type="date" id="obs-date" class="field" style="width:auto">
+                        <input type="date" id="obs-date" class="field" style="width:auto" hidden>
                         <span class="hint">관찰한 친구를 눌러 주세요. 여러 명을 함께 고를 수 있어요.</span>
                     </div>
                     <div class="kid-pick" id="obs-kids"></div>
@@ -636,7 +671,7 @@
                     <div class="row">
                         <h3 class="section-title" style="margin:0">소감 모아보기</h3>
                         <span class="spacer"></span>
-                        <input type="date" id="ref-date" class="field" style="width:auto">
+                        <input type="date" id="ref-date" class="field" style="width:auto" hidden>
                     </div>
                     <div class="mood-sum" id="ref-mood-sum"></div>
                     <div class="hint" id="ref-missing"></div>
@@ -650,7 +685,7 @@
                 <div class="card stack">
                     <h3 class="section-title" style="margin:0">알림장 재료 고르기</h3>
                     <div class="row">
-                        <input type="date" id="notice-date" class="field" style="width:auto">
+                        <input type="date" id="notice-date" class="field" style="width:auto" hidden>
                         <select class="field" id="notice-kid" style="width:auto;flex:1"></select>
                     </div>
                     <label class="toggle"><input type="checkbox" id="notice-sched" checked> <span data-k>오늘의 일과 넣기</span><span data-e>오늘의 시간표 넣기</span></label>
@@ -811,6 +846,22 @@
         </div>
     </section>
 
+    <!-- 하루 기록 -->
+    <section class="panel" id="panel-daylog">
+        <div class="card" style="margin-bottom:14px">
+            <div class="row">
+                <h2 class="section-title" style="margin:0" id="day-title"></h2>
+                <span class="spacer"></span>
+                <button class="btn no-print" id="btn-day-print">🖨️ 인쇄·PDF로 저장</button>
+            </div>
+            <div class="no-print" style="margin-top:12px">
+                <div class="hint" style="font-weight:700;margin-bottom:6px">기록이 있는 날 (누르면 그날로 이동)</div>
+                <div class="day-dates" id="day-dates"></div>
+            </div>
+        </div>
+        <div class="day-grid" id="day-grid"></div>
+    </section>
+
     <!-- 설정 -->
     <section class="panel" id="panel-settings">
         <div class="settings-grid">
@@ -946,6 +997,8 @@
             observations: [],
             notices: {},
             reflections: [],
+            schedByDate: {},
+            dayLog: {},
             groups: { mode: 'count', n: 4, list: [] },
             roles: DEFAULT_ROLES.map(([emoji, name]) => ({ id: uid(), emoji, name })),
             roleOrder: [],
@@ -969,13 +1022,24 @@
 
     const isElem = () => state.level === 'elem';
     const W = (kinder, elem) => isElem() ? elem : kinder;
-    const curSched = () => isElem() ? state.scheduleElem : state.schedule;
+    // 지금 보고 있는 기록 날짜. 모든 탭이 이 날짜의 기록을 보여 주고 저장한다.
+    let viewDate = todayKey();
 
-    // 날짜가 바뀌면 일과 체크를 새로 시작
-    if (state.scheduleDate !== todayKey()) {
-        [...state.schedule, ...state.scheduleElem].forEach(s => s.done = false);
-        state.scheduleDate = todayKey();
-        save();
+    // 일과(시간표)는 날짜별로 저장한다. 처음 여는 날은 가장 최근 날의 일과를 복사해 시작한다.
+    const curSched = () => {
+        const k = `${state.level}|${viewDate}`;
+        if (!state.schedByDate[k]) {
+            const prev = Object.keys(state.schedByDate).filter(x => x.startsWith(state.level + '|') && x < k).sort().pop();
+            const base = prev ? state.schedByDate[prev] : (isElem() ? state.scheduleElem : state.schedule);
+            state.schedByDate[k] = base.map(x => ({ ...x, id: uid(), done: false }));
+        }
+        return state.schedByDate[k];
+    };
+
+    // 그날 한 활동을 시간과 함께 남긴다
+    function logAct(text) {
+        const d = new Date();
+        (state.dayLog[viewDate] = state.dayLog[viewDate] || []).push({ t: `${pad(d.getHours())}:${pad(d.getMinutes())}`, text });
     }
 
     // ===== 공통 =====
@@ -1025,10 +1089,33 @@
         }
     }
 
+    function dateLabel(k) {
+        const [y, m, d] = k.split('-').map(Number);
+        return `${y}년 ${m}월 ${d}일 ${['일', '월', '화', '수', '목', '금', '토'][new Date(y, m - 1, d).getDay()]}요일`;
+    }
+    function setViewDate(k) {
+        if (!k) return;
+        viewDate = k;
+        ['att-date', 'obs-date', 'ref-date', 'notice-date'].forEach(id => $(id).value = k);
+        loadNoticeFields();
+        renderAll();
+    }
+    function shiftDay(n) {
+        const [y, m, d] = viewDate.split('-').map(Number);
+        setViewDate(dateKey(new Date(y, m - 1, d + n)));
+    }
+    $('view-date').onchange = () => setViewDate($('view-date').value);
+    $('btn-day-prev').onclick = () => shiftDay(-1);
+    $('btn-day-next').onclick = () => shiftDay(1);
+    $('btn-day-today').onclick = () => setViewDate(todayKey());
+
     function renderHeader() {
-        const d = new Date();
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        $('today-label').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
+        $('today-label').textContent = dateLabel(viewDate) + (viewDate === todayKey() ? ' (오늘)' : '');
+        $('view-date').value = viewDate;
+        const note = $('past-note');
+        note.hidden = viewDate === todayKey();
+        note.className = 'past' + (viewDate > todayKey() ? ' future' : '');
+        note.textContent = viewDate < todayKey() ? '지난 날 기록을 보고 있어요' : '앞으로의 날짜예요';
         $('class-title').innerHTML = `${esc(state.className || '우리 반')} ${W('하루 도우미', '학급 도우미')}<span class="mode-badge">${W('유치원', `초등 ${state.grade}학년`)}</span>`;
         $('logo').textContent = W('🌈', '🏫');
         $('btn-sound').textContent = state.sound ? '🔔' : '🔕';
@@ -1164,7 +1251,7 @@
         const i = curSched().findIndex(s => s.id === b.closest('.sched').dataset.id);
         const item = curSched()[i];
         const act = b.dataset.act;
-        if (act === 'toggle') { item.done = !item.done; if (item.done) sounds.pop(); }
+        if (act === 'toggle') { item.done = !item.done; if (item.done) { sounds.pop(); logAct(`${item.emoji} ${item.title} 마침`); } }
         if (act === 'up' && i > 0) [curSched()[i - 1], curSched()[i]] = [curSched()[i], curSched()[i - 1]];
         if (act === 'down' && i < curSched().length - 1) [curSched()[i + 1], curSched()[i]] = [curSched()[i], curSched()[i + 1]];
         if (act === 'del') {
@@ -1201,6 +1288,7 @@
         const i = currentIndex();
         if (i === -1) { toast('오늘 일과를 모두 마쳤어요!'); return; }
         curSched()[i].done = true;
+        logAct(`${curSched()[i].emoji} ${curSched()[i].title} 마침`);
         save(); renderSchedule(); sounds.chime();
         if (currentIndex() === -1) confetti();
         if ($('overlay').classList.contains('show') && overlayMode === 'schedule') showSchedule();
@@ -1327,7 +1415,7 @@
     function pickPool() {
         let pool = state.students;
         if ($('pick-present').checked) {
-            const day = state.attendance[todayKey()] || {};
+            const day = state.attendance[viewDate] || {};
             const present = pool.filter(s => day[s.id] === 'present');
             if (present.length) pool = present;
         }
@@ -1361,6 +1449,8 @@
             nameEl.textContent = winner.name; faceEl.textContent = winner.face;
             nameEl.className = 'picker-name chosen';
             picked.push(winner.id);
+            logAct(`🎯 이름 뽑기: ${winner.name}`);
+            save();
             sounds.chime(); confetti(20);
             rolling = false;
             renderPicker();
@@ -1413,6 +1503,7 @@
             if (n >= goal) { toast('이미 스티커판을 다 채웠어요! 🏆'); return; }
             state.stickers[id] = n + 1;
             lastSticker = id;
+            logAct(`${state.stickerIcon} ${studentOf(id).name} 칭찬 스티커 +1 (${n + 1}/${goal})`);
             if (n + 1 === goal) {
                 const s = state.students.find(x => x.id === id);
                 sounds.alarm(); confetti(60);
@@ -1420,6 +1511,7 @@
             } else sounds.pop();
         } else {
             state.stickers[id] = Math.max(0, n - 1);
+            if (n > 0) logAct(`${state.stickerIcon} ${studentOf(id).name} 칭찬 스티커 −1`);
         }
         save(); renderStickers();
     });
@@ -1976,7 +2068,7 @@
     // ===== 모둠 편성 =====
     const GROUP_LOOK = [['🍎', '#e5646a'], ['🍊', '#ff8a5b'], ['🍋', '#e0a91b'], ['🍏', '#4cb782'], ['🫐', '#5b9dff'], ['🍇', '#9b6bdf'], ['🍑', '#e56fb0'], ['🥥', '#8a6d4b'], ['🍉', '#3fb5c9'], ['🥝', '#6aa84f']];
     const presentIds = () => {
-        const day = state.attendance[todayKey()] || {};
+        const day = state.attendance[viewDate] || {};
         const present = state.students.filter(s => day[s.id] === 'present');
         return present.length ? present : state.students;
     };
@@ -2019,6 +2111,7 @@
         pool.forEach((id, i) => list[i % k].members.push(id));
         if ($('grp-leader').checked) list.forEach(g => g.leader = g.members[Math.floor(Math.random() * g.members.length)] || null);
         state.groups.list = list;
+        logAct(`👥 모둠 편성: ${list.map((g, i) => `${i + 1}모둠(${g.members.map(id => studentOf(id).name).join(', ')})`).join(' / ')}`);
         save(); renderGroups(); sounds.chime();
         toast(`${pool.length}명을 ${k}모둠으로 나눴어요`);
     };
@@ -2026,6 +2119,8 @@
         const b = e.target.closest('button[data-gact]');
         if (!b) return;
         const g = state.groups.list[+b.closest('.group-card').dataset.gi];
+        const gi = +b.closest('.group-card').dataset.gi;
+        if (b.dataset.gact === 'plus' || g.score > 0) logAct(`👥 ${gi + 1}모둠 ${b.dataset.gact === 'plus' ? '+1점' : '−1점'}`);
         g.score = Math.max(0, g.score + (b.dataset.gact === 'plus' ? 1 : -1));
         if (b.dataset.gact === 'plus') sounds.pop();
         save(); renderGroups();
@@ -2052,7 +2147,7 @@
         return state.roles.map((r, i) => ({ role: r, sid: n ? order[(i + state.roleOffset) % n] : null }));
     }
     function roleCards(big) {
-        const done = state.roleDone[todayKey()] || {};
+        const done = state.roleDone[viewDate] || {};
         return roleAssign().map(({ role, sid }) => {
             const s = studentOf(sid);
             return `<div class="role-card ${done[role.id] ? 'done' : ''}" data-id="${role.id}">
@@ -2065,7 +2160,7 @@
     }
     function renderRoles() {
         const assign = roleAssign();
-        const done = state.roleDone[todayKey()] || {};
+        const done = state.roleDone[viewDate] || {};
         const doneCount = state.roles.filter(r => done[r.id]).length;
         $('role-info').textContent = state.roles.length ? `오늘 ${doneCount} / ${state.roles.length}개 역할 완료` : '';
         $('role-grid').innerHTML = !state.students.length ? emptyRoster('친구를 등록하면 역할을 나눌 수 있어요.')
@@ -2088,9 +2183,13 @@
             if (!confirm(`'${r.name}' 역할을 지울까요?`)) return;
             state.roles = state.roles.filter(x => x.id !== id);
         } else {
-            const day = state.roleDone[todayKey()] || (state.roleDone[todayKey()] = {});
+            const day = state.roleDone[viewDate] || (state.roleDone[viewDate] = {});
             day[id] = !day[id];
-            if (day[id]) sounds.pop();
+            if (day[id]) {
+                sounds.pop();
+                const a = roleAssign().find(x => x.role.id === id);
+                logAct(`🧹 ${a.role.name} 완료${studentOf(a.sid) ? ` (${studentOf(a.sid).name})` : ''}`);
+            }
             if (state.roles.every(r => day[r.id])) { confetti(40); toast('🎉 오늘 모든 역할을 마쳤어요!'); }
         }
         save(); renderRoles();
@@ -2166,10 +2265,9 @@
         if (!refSel.mood) { toast('오늘 기분을 골라 주세요'); return; }
         if (!text) { toast('소감을 한 줄 적어 주세요'); return; }
         const s = studentOf(refSel.kid);
-        state.reflections.push({ id: uid(), date: todayKey(), studentId: refSel.kid, mood: refSel.mood, prompt: $('ref-prompt').value, text });
+        state.reflections.push({ id: uid(), date: viewDate, studentId: refSel.kid, mood: refSel.mood, prompt: $('ref-prompt').value, text });
         refSel.kid = null; refSel.mood = null;
         $('ref-text').value = '';
-        $('ref-date').value = todayKey();
         save(); renderReflect(); sounds.chime();
         toast(`${s.name}, 소감을 잘 썼어요! 👏`);
     };
@@ -2295,6 +2393,68 @@
         setTimeout(stepOnce, 300);
     };
 
+    // ===== 하루 기록 =====
+    function datesWithRecords() {
+        const set = new Set();
+        Object.entries(state.attendance).forEach(([k, v]) => { if (Object.keys(v).length) set.add(k); });
+        state.observations.forEach(o => set.add(o.date));
+        state.reflections.forEach(r => set.add(r.date));
+        Object.entries(state.dayLog).forEach(([k, v]) => { if (v.length) set.add(k); });
+        Object.keys(state.notices).forEach(k => set.add(k));
+        Object.entries(state.roleDone).forEach(([k, v]) => { if (Object.values(v).some(Boolean)) set.add(k); });
+        Object.entries(state.schedByDate).forEach(([k, v]) => { if (v.some(x => x.done)) set.add(k.split('|')[1]); });
+        return [...set].sort().reverse();
+    }
+    function renderDayLog() {
+        const k = viewDate;
+        $('day-title').textContent = `📅 ${dateLabel(k)} 하루 기록`;
+        const dates = datesWithRecords();
+        $('day-dates').innerHTML = dates.length
+            ? dates.slice(0, 60).map(d => `<button class="chip ${d === k ? 'on' : ''}" data-d="${d}">${+d.slice(5, 7)}/${+d.slice(8)}</button>`).join('')
+            : '<span class="hint">아직 기록이 있는 날이 없어요.</span>';
+
+        const li = items => items.length ? `<ul>${items.join('')}</ul>` : '<div class="none">기록이 없어요</div>';
+        const card = (icon, title, items, cnt) => `<div class="card day-card"><h3>${icon} ${title}${cnt != null ? `<span class="cnt">${cnt}</span>` : ''}</h3>${li(items)}</div>`;
+        const name = id => { const s = studentOf(id); return s ? `${s.face} ${esc(s.name)}` : '(삭제된 친구)'; };
+
+        const att = state.attendance[k] || {};
+        const present = state.students.filter(s => att[s.id] === 'present');
+        const absent = state.students.filter(s => att[s.id] === 'absent');
+        const attItems = [];
+        if (present.length) attItems.push(`<li><b>${W('등원', '출석')} ${present.length}명</b> · ${present.map(s => esc(s.name)).join(', ')}</li>`);
+        if (absent.length) attItems.push(`<li><b>결석 ${absent.length}명</b> · ${absent.map(s => esc(s.name)).join(', ')}</li>`);
+
+        const sched = curSched();
+        const schedItems = sched.map(x => `<li>${x.done ? '✅' : '⬜'} ${x.time ? `<span class="time">${esc(x.time)}</span>` : ''}${esc(x.emoji)} ${esc(x.title)}</li>`);
+
+        const obs = state.observations.filter(o => o.date === k);
+        const obsItems = obs.map(o => `<li><b>${name(o.studentId)}</b> ${o.areas.map(a => `<span class="area-tag" style="--a:${areaOf(a).color}">${areaOf(a).name}</span>`).join('')}<br>${esc(o.text)}</li>`);
+
+        const refs = state.reflections.filter(r => r.date === k);
+        const refItems = refs.map(r => `<li><b>${name(r.studentId)}</b> ${r.mood} <span class="hint">${esc(r.prompt)}</span><br>${esc(r.text)}</li>`);
+
+        const n = state.notices[k] || {};
+        const noteItems = [['🧸 ' + W('놀이 이야기', '오늘의 배움'), n.play], ['📢 알려 드려요', n.info], ['🎒 준비물', n.items]]
+            .filter(([, v]) => v).map(([t, v]) => `<li><b>${t}</b><br>${esc(v)}</li>`);
+
+        const log = (state.dayLog[k] || []).slice().sort((a, b) => a.t.localeCompare(b.t));
+        const logItems = log.map(l => `<li><span class="time">${l.t}</span>${esc(l.text)}</li>`);
+
+        $('day-grid').innerHTML = [
+            card('🙋', '출석', attItems, `${present.length}/${state.students.length}명`),
+            card('🗓️', W('하루 일과', '시간표'), schedItems, `${sched.filter(x => x.done).length}/${sched.length} 마침`),
+            card('📝', W('관찰 기록', '생활 기록'), obsItems, `${obs.length}건`),
+            isElem() ? card('✏️', '학생 소감', refItems, `${refs.length}명`) : '',
+            card('💌', '알림장 메모', noteItems),
+            card('⏱️', '활동 기록 (시간순)', logItems, `${log.length}건`)
+        ].join('');
+    }
+    $('day-dates').addEventListener('click', e => {
+        const b = e.target.closest('button[data-d]');
+        if (b) setViewDate(b.dataset.d);
+    });
+    $('btn-day-print').onclick = () => window.print();
+
     // ===== 시작 =====
     function renderAll() {
         renderHeader();
@@ -2308,6 +2468,7 @@
         renderGroups();
         renderRoles();
         renderObserve();
+        renderDayLog();
         if ($('panel-steam').classList.contains('active')) renderSteam();
         renderSettings();
     }
