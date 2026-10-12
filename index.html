@@ -286,8 +286,52 @@
         @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .pattern-msg { min-height: 1.6em; margin-top: 16px; font-size: 22px; font-weight: 800; }
 
+        /* 학교급 전환: data-k는 유치원에서만, data-e는 초등에서만 보임 */
+        body.elem [data-k], body:not(.elem) [data-e] { display: none !important; }
+        .level-switch { display: flex; background: var(--bg); border-radius: 999px; padding: 4px; flex-shrink: 0; }
+        .level-switch button { padding: 8px 12px; border-radius: 999px; font-weight: 800; font-size: 14px; color: var(--muted); white-space: nowrap; }
+        .level-switch button.on { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+        .head-right { display: flex; align-items: center; gap: 8px; }
+
+        /* 모둠 편성 */
+        .group-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+        .group-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; border-top: 8px solid var(--g); animation: pop .4s ease; }
+        .group-card h4 { margin: 0 0 8px; font-size: 20px; display: flex; align-items: center; gap: 6px; }
+        .group-card .members { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; }
+        .group-card .member { background: var(--bg); border-radius: 10px; padding: 6px 10px; font-weight: 700; }
+        .group-card .member.leader { background: var(--yellow-soft); }
+        .group-score { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+        .group-score b { font-size: 26px; color: var(--g); }
+        .overlay .group-grid { width: min(1200px, 100%); }
+        .overlay .group-card h4 { font-size: 30px; }
+        .overlay .group-card .member { font-size: 22px; }
+        .num-step { display: flex; align-items: center; gap: 6px; font-weight: 800; }
+        .num-step b { min-width: 28px; text-align: center; font-size: 20px; }
+
+        /* 1인 1역 */
+        .role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+        .role-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 8px; border: 3px solid transparent; }
+        .role-card.done { border-color: var(--green); background: var(--green-soft); }
+        .role-card .role-name { font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 6px; }
+        .role-card .role-name .emoji { font-size: 28px; }
+        .role-card .who { font-size: 20px; font-weight: 900; }
+        .role-card .del { margin-left: auto; color: var(--red); font-size: 14px; padding: 2px 6px; }
+        .overlay .role-grid { width: min(1200px, 100%); }
+        .overlay .role-card .who { font-size: 28px; }
+
+        /* 학생 소감 */
+        .moods { display: flex; gap: 8px; flex-wrap: wrap; }
+        .moods button { font-size: 34px; width: 60px; height: 60px; border-radius: 16px; background: var(--bg); border: 3px solid transparent; }
+        .moods button.on { border-color: var(--primary); background: #fff3ec; }
+        .mood-sum { display: flex; gap: 12px; flex-wrap: wrap; font-weight: 800; font-size: 18px; }
+
+        /* 숫자 규칙 */
+        .pattern-row .num { min-width: 1.6em; padding: 0 .2em; height: 1.4em; border-radius: 16px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .75em; }
+        .choices button.num-choice { font-size: clamp(28px, 6vw, 44px); font-weight: 900; width: auto; min-width: 2.4em; padding: 0 .4em; }
+
         @media (max-width: 760px) {
             .obs-grid, .notice-grid { grid-template-columns: 1fr; }
+            .level-switch button { padding: 6px 8px; font-size: 13px; }
             .pot { width: 62px; height: 62px; font-size: 12px; }
             .bar-key { font-size: 15px; }
         }
@@ -312,17 +356,25 @@
             <div class="today" id="today-label"></div>
         </div>
     </div>
-    <button class="icon-btn" id="btn-sound" title="소리 켜기/끄기">🔔</button>
+    <div class="head-right">
+        <div class="level-switch" id="level-switch">
+            <button data-level="kinder">🧸 유치원</button>
+            <button data-level="elem">🎒 초등</button>
+        </div>
+        <button class="icon-btn" id="btn-sound" title="소리 켜기/끄기">🔔</button>
+    </div>
 </header>
 
 <nav id="tabs">
     <button data-tab="attendance" class="active">🙋 출석</button>
-    <button data-tab="schedule">🗓️ 오늘 일과</button>
+    <button data-tab="schedule"><span data-k>🗓️ 오늘 일과</span><span data-e>🗓️ 시간표</span></button>
     <button data-tab="timer">⏰ 타이머</button>
     <button data-tab="picker">🎯 이름 뽑기</button>
     <button data-tab="stickers">⭐ 칭찬 스티커</button>
-    <button data-tab="observe">📝 관찰·알림장</button>
-    <button data-tab="steam">🧪 STEAM 놀이</button>
+    <button data-tab="groups" data-e>👥 모둠 편성</button>
+    <button data-tab="roles" data-e>🧹 1인 1역</button>
+    <button data-tab="observe"><span data-k>📝 관찰·알림장</span><span data-e>📝 생활 기록·알림장</span></button>
+    <button data-tab="steam"><span data-k>🧪 STEAM 놀이</span><span data-e>🧪 STEAM 탐구</span></button>
     <button data-tab="settings">⚙️ 우리 반 설정</button>
 </nav>
 
@@ -331,13 +383,13 @@
     <section class="panel active" id="panel-attendance">
         <div class="row" style="margin-bottom:12px">
             <input type="date" id="att-date" class="field" style="width:auto">
-            <span class="hint">카드를 누르면 확인 전 → 등원 → 결석 순서로 바뀌어요.</span>
+            <span class="hint">카드를 누르면 확인 전 → <span data-k>등원</span><span data-e>출석</span> → 결석 순서로 바뀌어요.</span>
             <span class="spacer"></span>
-            <button class="btn green" id="btn-all-present">모두 등원</button>
+            <button class="btn green" id="btn-all-present"><span data-k>모두 등원</span><span data-e>모두 출석</span></button>
             <button class="btn" id="btn-att-reset">다시 체크</button>
         </div>
         <div class="stats">
-            <div class="stat present">등원<b id="cnt-present">0</b></div>
+            <div class="stat present"><span data-k>등원</span><span data-e>출석</span><b id="cnt-present">0</b></div>
             <div class="stat absent">결석<b id="cnt-absent">0</b></div>
             <div class="stat unknown">확인 전<b id="cnt-unknown">0</b></div>
         </div>
@@ -347,16 +399,16 @@
     <!-- 일과표 -->
     <section class="panel" id="panel-schedule">
         <div class="row" style="margin-bottom:12px">
-            <h2 class="section-title" style="margin:0">오늘의 일과</h2>
+            <h2 class="section-title" style="margin:0"><span data-k>오늘의 일과</span><span data-e>오늘의 시간표</span></h2>
             <span class="spacer"></span>
             <button class="btn" id="btn-sched-reset">체크 모두 지우기</button>
             <button class="btn green" id="btn-sched-next">다음 활동으로 ▶</button>
-            <button class="btn primary" id="btn-sched-show">📺 아이들에게 크게 보여주기</button>
+            <button class="btn primary" id="btn-sched-show">📺 교실 화면에 크게 보여주기</button>
         </div>
         <div class="schedule-list" id="sched-list"></div>
 
         <div class="card" style="margin-top:16px">
-            <h3 class="section-title">활동 추가하기</h3>
+            <h3 class="section-title"><span data-k>활동 추가하기</span><span data-e>교시·활동 추가하기</span></h3>
             <div class="form-grid">
                 <input class="field" id="sched-emoji" maxlength="4" placeholder="🧸" style="text-align:center;font-size:22px">
                 <input class="field" id="sched-title" maxlength="20" placeholder="활동 이름 (예: 자유놀이)">
@@ -395,7 +447,7 @@
                     <span id="timer-set">5분</span>
                     <button class="btn" data-step="60">+ 1분</button>
                 </div>
-                <p class="hint">시간이 줄어들수록 초록 → 노랑 → 빨강으로 바뀌어 아이들이 남은 시간을 눈으로 알 수 있어요.</p>
+                <p class="hint">시간이 줄어들수록 초록 → 노랑 → 빨강으로 바뀌어 누구나 남은 시간을 눈으로 알 수 있어요.</p>
             </div>
         </div>
     </section>
@@ -409,7 +461,7 @@
         </div>
         <div class="card" style="margin-top:16px">
             <div class="row">
-                <label class="toggle"><input type="checkbox" id="pick-present" checked> 등원한 친구만</label>
+                <label class="toggle"><input type="checkbox" id="pick-present" checked> <span data-k>등원한</span><span data-e>출석한</span> 친구만</label>
                 <label class="toggle"><input type="checkbox" id="pick-norepeat" checked> 한 번 뽑힌 친구는 빼기</label>
                 <span class="spacer"></span>
                 <span class="hint" id="pick-remaining"></span>
@@ -442,23 +494,72 @@
         <div class="sticker-grid" id="sticker-grid"></div>
     </section>
 
+    <!-- 모둠 편성 -->
+    <section class="panel" id="panel-groups">
+        <div class="card row" style="margin-bottom:12px">
+            <select class="field" id="grp-mode" style="width:auto;min-height:40px;padding:6px 10px">
+                <option value="count">모둠 수로 나누기</option>
+                <option value="size">모둠 인원으로 나누기</option>
+            </select>
+            <div class="num-step">
+                <button class="btn small" data-gstep="-1">−</button>
+                <b id="grp-n">4</b><span id="grp-unit">모둠</span>
+                <button class="btn small" data-gstep="1">+</button>
+            </div>
+            <label class="toggle"><input type="checkbox" id="grp-present" checked> 출석한 친구만</label>
+            <label class="toggle"><input type="checkbox" id="grp-leader" checked> 모둠장 정하기</label>
+            <span class="spacer"></span>
+            <button class="btn" id="btn-grp-reset">점수 0으로</button>
+            <button class="btn" id="btn-grp-show">📺 크게</button>
+            <button class="btn primary" id="btn-grp-make">🔀 모둠 만들기</button>
+        </div>
+        <div class="group-grid" id="grp-grid"></div>
+    </section>
+
+    <!-- 1인 1역 -->
+    <section class="panel" id="panel-roles">
+        <div class="row" style="margin-bottom:12px">
+            <span class="hint" id="role-info"></span>
+            <span class="spacer"></span>
+            <button class="btn" id="btn-role-shuffle">🔀 무작위로 정하기</button>
+            <button class="btn" id="btn-role-show">📺 크게</button>
+            <button class="btn primary" id="btn-role-rotate">▶ 한 칸씩 돌리기</button>
+        </div>
+        <div class="role-grid" id="role-grid"></div>
+        <div class="card" id="role-rest-card" style="margin-top:12px">
+            <div class="hint" style="font-weight:700;margin-bottom:6px">이번에 역할이 없는 친구</div>
+            <div class="history" id="role-rest"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+            <h3 class="section-title">역할 추가하기</h3>
+            <div class="form-grid" style="grid-template-columns:90px 1fr auto">
+                <input class="field" id="role-emoji" maxlength="4" placeholder="🧽" style="text-align:center;font-size:22px">
+                <input class="field" id="role-name" maxlength="16" placeholder="역할 이름 (예: 칠판 정리)">
+                <button class="btn primary" id="btn-role-add">추가</button>
+            </div>
+            <p class="hint" style="margin:12px 0 8px">카드를 누르면 오늘 역할을 마쳤다고 표시돼요. "한 칸씩 돌리기"를 누르면 모든 친구의 역할이 다음 역할로 바뀌어요.</p>
+            <div class="preset-chips" id="role-presets"></div>
+        </div>
+    </section>
+
     <!-- 관찰·알림장 -->
     <section class="panel" id="panel-observe">
         <div class="seg" id="obs-seg">
-            <button data-sub="obs-write" class="on">📝 관찰 기록</button>
+            <button data-sub="obs-write" class="on"><span data-k>📝 관찰 기록</span><span data-e>📝 생활 기록</span></button>
+            <button data-sub="obs-reflect" data-e>✏️ 오늘의 소감</button>
             <button data-sub="obs-notice">💌 알림장 만들기</button>
         </div>
 
         <div class="steam-act on" id="obs-write">
             <div class="obs-grid">
                 <div class="card stack">
-                    <h3 class="section-title" style="margin:0">관찰 기록 쓰기</h3>
+                    <h3 class="section-title" style="margin:0"><span data-k>관찰 기록 쓰기</span><span data-e>생활 기록 쓰기</span></h3>
                     <div class="row">
                         <input type="date" id="obs-date" class="field" style="width:auto">
                         <span class="hint">관찰한 친구를 눌러 주세요. 여러 명을 함께 고를 수 있어요.</span>
                     </div>
                     <div class="kid-pick" id="obs-kids"></div>
-                    <div class="hint" style="font-weight:700">누리과정 영역</div>
+                    <div class="hint" style="font-weight:700"><span data-k>누리과정 영역</span><span data-e>기록 영역</span></div>
                     <div class="area-chips" id="obs-areas"></div>
                     <textarea class="field" id="obs-text" maxlength="500" placeholder="본 그대로 적어 주세요. 예) 블록을 높이 쌓다 무너지자 아래를 넓게 바꾸어 다시 쌓았어요."></textarea>
                     <div class="hint">자주 쓰는 관찰 문장 (누르면 위에 이어서 적혀요)</div>
@@ -481,6 +582,32 @@
             </div>
         </div>
 
+        <div class="steam-act" id="obs-reflect">
+            <div class="obs-grid">
+                <div class="card stack">
+                    <h3 class="section-title" style="margin:0">오늘의 소감 쓰기</h3>
+                    <p class="hint" style="margin:0">학생이 직접 자기 이름을 누르고 써요. 저장하면 다음 친구를 위해 화면이 비워져요.</p>
+                    <div class="kid-pick" id="ref-kids"></div>
+                    <div class="hint" style="font-weight:700">오늘 내 기분은?</div>
+                    <div class="moods" id="ref-moods"></div>
+                    <div class="hint" style="font-weight:700">오늘의 질문</div>
+                    <select class="field" id="ref-prompt"></select>
+                    <textarea class="field" id="ref-text" maxlength="200" placeholder="내 생각을 한두 문장으로 적어 보세요."></textarea>
+                    <button class="btn primary" id="btn-ref-save">✏️ 소감 저장</button>
+                </div>
+                <div class="card stack">
+                    <div class="row">
+                        <h3 class="section-title" style="margin:0">소감 모아보기</h3>
+                        <span class="spacer"></span>
+                        <input type="date" id="ref-date" class="field" style="width:auto">
+                    </div>
+                    <div class="mood-sum" id="ref-mood-sum"></div>
+                    <div class="hint" id="ref-missing"></div>
+                    <div class="obs-list" id="ref-list"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="steam-act" id="obs-notice">
             <div class="notice-grid">
                 <div class="card stack">
@@ -489,9 +616,10 @@
                         <input type="date" id="notice-date" class="field" style="width:auto">
                         <select class="field" id="notice-kid" style="width:auto;flex:1"></select>
                     </div>
-                    <label class="toggle"><input type="checkbox" id="notice-sched" checked> 오늘의 일과 넣기</label>
-                    <label class="toggle"><input type="checkbox" id="notice-obs" checked> 이 날의 관찰 기록 넣기 (친구를 골랐을 때)</label>
-                    <div class="hint" style="font-weight:700">오늘의 놀이 이야기 (반 전체)</div>
+                    <label class="toggle"><input type="checkbox" id="notice-sched" checked> <span data-k>오늘의 일과 넣기</span><span data-e>오늘의 시간표 넣기</span></label>
+                    <label class="toggle"><input type="checkbox" id="notice-obs" checked> 이 날의 <span data-k>관찰</span><span data-e>생활</span> 기록 넣기 (친구를 골랐을 때)</label>
+                    <label class="toggle" data-e><input type="checkbox" id="notice-ref" checked> 학생이 쓴 오늘의 소감 넣기 (친구를 골랐을 때)</label>
+                    <div class="hint" style="font-weight:700"><span data-k>오늘의 놀이 이야기 (반 전체)</span><span data-e>오늘의 배움 (반 전체)</span></div>
                     <textarea class="field" id="notice-play" maxlength="400" placeholder="예) 오늘은 가을 나뭇잎을 모아 색깔별로 나누어 보았어요."></textarea>
                     <div class="hint" style="font-weight:700">알려 드려요</div>
                     <textarea class="field" id="notice-info" maxlength="400" placeholder="예) 금요일은 현장체험학습이 있어요. 편한 신발을 신겨 보내 주세요."></textarea>
@@ -517,7 +645,7 @@
         <div class="seg" id="steam-seg">
             <button data-sub="act-mix" class="on">🎨 색 섞기</button>
             <button data-sub="act-sound">🎵 소리 탐색</button>
-            <button data-sub="act-pattern">🔷 패턴 놀이</button>
+            <button data-sub="act-pattern"><span data-k>🔷 패턴 놀이</span><span data-e>🔷 규칙 찾기</span></button>
             <span class="spacer"></span>
             <button id="btn-steam-full" style="background:var(--primary);color:#fff">📺 전체 화면</button>
         </div>
@@ -536,7 +664,15 @@
                 </div>
                 <div class="swatches" id="swatches"></div>
             </div>
-            <div class="tip">
+            <div class="tip" data-e>
+                <h4>👩‍🏫 교사 도움말 · 미술, 과학 연계</h4>
+                <ul>
+                    <li>미술 시간 색의 혼합 활동 전에 예상 → 실험 → 확인 순서로 써 보세요. "파랑과 노랑을 1:3으로 섞으면?"</li>
+                    <li>방울 수를 바꾸며 결과를 표로 정리하면, 비율에 따라 색이 달라지는 것을 발견할 수 있어요.</li>
+                    <li>고학년은 물감(빼기 혼합)과 빛(더하기 혼합, 빨강·초록·파랑)의 차이를 비교해 보세요. 모니터 화면을 돋보기로 보면 빛의 삼원색을 볼 수 있어요.</li>
+                </ul>
+            </div>
+            <div class="tip" data-k>
                 <h4>👩‍🏫 교사 도움말 · 예술경험, 자연탐구</h4>
                 <ul>
                     <li>섞기 전에 먼저 물어보세요. "빨강과 노랑을 섞으면 어떤 색이 될까?"</li>
@@ -557,7 +693,15 @@
                 <canvas class="wave-pad" id="wave-pad"></canvas>
                 <div class="wave-info"><span>← 낮은 소리</span><span id="wave-state">위로 갈수록 큰 소리</span><span>높은 소리 →</span></div>
             </div>
-            <div class="tip">
+            <div class="tip" data-e>
+                <h4>👩‍🏫 교사 도움말 · 과학(소리의 성질), 음악 연계</h4>
+                <ul>
+                    <li>소리 파도 아래에 진동수(Hz)가 나와요. 높은 소리일수록 1초에 더 많이 떨린다는 것을 숫자로 확인해 보세요.</li>
+                    <li>"소리의 높낮이"와 "소리의 세기"를 구분해서 말하게 해 보세요. 좌우는 높낮이, 위아래는 세기예요.</li>
+                    <li>실로폰 막대 길이와 음 높이의 관계를 표로 정리하고, 고무줄·빨대 피리로 직접 확인해 보세요.</li>
+                </ul>
+            </div>
+            <div class="tip" data-k>
                 <h4>👩‍🏫 교사 도움말 · 자연탐구, 예술경험</h4>
                 <ul>
                     <li>"긴 막대와 짧은 막대 중 어느 쪽이 높은 소리가 날까?" 먼저 예상하고 두드려 봐요.</li>
@@ -578,7 +722,15 @@
                 <div class="pattern-msg" id="pattern-msg"></div>
                 <button class="btn" id="btn-pattern-next" style="margin-top:8px">다른 문제 ▶</button>
             </div>
-            <div class="tip">
+            <div class="tip" data-e>
+                <h4>👩‍🏫 교사 도움말 · 수학(규칙 찾기, 규칙과 대응), SW교육</h4>
+                <ul>
+                    <li>설정 탭에서 학년을 고르면 문제 난이도가 바뀌어요. 1~2학년은 모양·뛰어 세기, 3학년 이상은 수의 규칙이 나와요.</li>
+                    <li>정답 뒤에 "규칙을 한 문장으로 말해 볼까?"라고 물어 규칙을 말과 식으로 표현하게 해 주세요.</li>
+                    <li>규칙 찾기는 컴퓨팅 사고력의 '패턴 인식', 규칙을 식으로 나타내기는 '추상화'와 이어져요.</li>
+                </ul>
+            </div>
+            <div class="tip" data-k>
                 <h4>👩‍🏫 교사 도움말 · 자연탐구(수학적 탐구), SW교육 기초</h4>
                 <ul>
                     <li>정답을 고른 뒤 "왜 그렇게 생각했니?"라고 물어 규칙을 말로 표현하게 해 주세요.</li>
@@ -594,7 +746,15 @@
         <div class="settings-grid">
             <div class="card">
                 <h3 class="section-title">우리 반 이름</h3>
-                <input class="field" id="class-name" maxlength="20" placeholder="예: 햇살반">
+                <input class="field" id="class-name" maxlength="20" placeholder="예: 햇살반, 4학년 2반">
+                <div data-e>
+                    <h3 class="section-title" style="margin-top:18px">학년</h3>
+                    <select class="field" id="grade">
+                        <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
+                        <option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option>
+                    </select>
+                    <p class="hint" style="margin-bottom:0">STEAM 탐구의 규칙 찾기 난이도가 학년에 맞게 바뀌어요.</p>
+                </div>
                 <h3 class="section-title" style="margin-top:18px">친구 추가하기</h3>
                 <p class="hint" style="margin-top:0">한 줄에 한 명씩 이름을 적으면 여러 명을 한꺼번에 넣을 수 있어요.</p>
                 <textarea class="field" id="roster-input" placeholder="김하늘&#10;이바다&#10;박구름"></textarea>
@@ -645,6 +805,22 @@
         ['🗣️','이야기 나누기','10:30'], ['🌳','바깥놀이','11:00'], ['🍚','점심','12:00'], ['📚','동화 듣기','13:00'], ['🏠','귀가','13:40']
     ];
 
+    const SCHED_PRESETS_E = [
+        ['📖','국어'], ['➗','수학'], ['🌏','사회'], ['🔬','과학'], ['🔤','영어'], ['🎵','음악'], ['🎨','미술'],
+        ['⚽','체육'], ['💻','실과'], ['💗','도덕'], ['🌱','바른 생활'], ['🔍','슬기로운 생활'], ['🎈','즐거운 생활'],
+        ['🙋','창의적 체험활동'], ['☕','쉬는 시간'], ['🏃','중간 놀이'], ['🍚','점심'], ['🧹','청소'], ['📝','알림장 쓰기'], ['🏠','하교']
+    ];
+    const DEFAULT_SCHEDULE_E = [
+        ['🌅','아침 활동','08:40'], ['📘','1교시','09:00'], ['📗','2교시','09:50'], ['🏃','중간 놀이','10:30'], ['📙','3교시','11:00'],
+        ['📕','4교시','11:50'], ['🍚','점심','12:30'], ['📓','5교시','13:30'], ['🧹','청소·알림장','14:10'], ['🏠','하교','14:30']
+    ];
+    const DEFAULT_ROLES = [
+        ['🧽','칠판 정리'], ['🪟','창문 열고 닫기'], ['💡','전등 끄기'], ['🪴','화분 물 주기'], ['♻️','분리수거'], ['🍱','급식 도우미'],
+        ['📚','학급 문고 정리'], ['💻','컴퓨터·TV 끄기'], ['👟','신발장 정리'], ['📮','가정통신문 나누기'], ['🧹','교실 바닥 점검'], ['📅','날짜·시간표 바꾸기']
+    ];
+    const ROLE_PRESETS = [...DEFAULT_ROLES, ['🥛','우유 나르기'], ['📋','출석부 전달'], ['🗑️','쓰레기통 비우기'], ['🖍️','미술 도구 정리'], ['🧴','손 소독제 챙기기'], ['🔑','교실 문 잠그기']];
+    const toItems = arr => arr.map(([emoji, title, time]) => ({ id: uid(), emoji, title, time: time || '', done: false }));
+
     const uid = () => Math.random().toString(36).slice(2, 10);
     const pad = n => String(n).padStart(2, '0');
     const dateKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -657,13 +833,22 @@
             sound: true,
             students: [],
             attendance: {},
-            schedule: DEFAULT_SCHEDULE.map(([emoji, title, time]) => ({ id: uid(), emoji, title, time, done: false })),
+            level: 'kinder',
+            grade: 3,
+            schedule: toItems(DEFAULT_SCHEDULE),
+            scheduleElem: toItems(DEFAULT_SCHEDULE_E),
             scheduleDate: todayKey(),
             stickers: {},
             stickerGoal: 10,
             stickerIcon: '⭐',
             observations: [],
-            notices: {}
+            notices: {},
+            reflections: [],
+            groups: { mode: 'count', n: 4, list: [] },
+            roles: DEFAULT_ROLES.map(([emoji, name]) => ({ id: uid(), emoji, name })),
+            roleOrder: [],
+            roleOffset: 0,
+            roleDone: {}
         };
     }
 
@@ -680,9 +865,13 @@
         try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 저장 실패 시 화면 동작은 유지 */ }
     }
 
+    const isElem = () => state.level === 'elem';
+    const W = (kinder, elem) => isElem() ? elem : kinder;
+    const curSched = () => isElem() ? state.scheduleElem : state.schedule;
+
     // 날짜가 바뀌면 일과 체크를 새로 시작
     if (state.scheduleDate !== todayKey()) {
-        state.schedule.forEach(s => s.done = false);
+        [...state.schedule, ...state.scheduleElem].forEach(s => s.done = false);
         state.scheduleDate = todayKey();
         save();
     }
@@ -740,7 +929,23 @@
         $('today-label').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
         $('class-title').textContent = state.className ? `${state.className} 하루 도우미` : '우리 반 하루 도우미';
         $('btn-sound').textContent = state.sound ? '🔔' : '🔕';
+        document.body.classList.toggle('elem', isElem());
+        document.querySelectorAll('#level-switch button').forEach(b => b.classList.toggle('on', b.dataset.level === state.level));
     }
+    $('level-switch').addEventListener('click', e => {
+        const b = e.target.closest('button[data-level]');
+        if (!b || b.dataset.level === state.level) return;
+        state.level = b.dataset.level;
+        obsSel.areas.clear();
+        save();
+        renderHeader();
+        // 지금 보던 탭이 이 학교급에 없으면 출석 탭으로
+        const active = document.querySelector('#tabs button.active');
+        if (!active || getComputedStyle(active).display === 'none') document.querySelector('[data-tab=attendance]').click();
+        else renderAll();
+        newPattern();
+        toast(isElem() ? '🎒 초등 모드로 바꿨어요' : '🧸 유치원 모드로 바꿨어요');
+    });
     $('btn-sound').onclick = () => {
         state.sound = !state.sound; save(); renderHeader();
         toast(state.sound ? '소리를 켰어요' : '소리를 껐어요');
@@ -766,7 +971,6 @@
         const k = $('att-date').value || todayKey();
         return state.attendance[k] || (state.attendance[k] = {});
     };
-    const STATUS_LABEL = { present: '등원', absent: '결석', unknown: '확인 전' };
 
     function renderAttendance() {
         const day = attDay();
@@ -781,7 +985,7 @@
                 return `<button class="kid ${st}" data-id="${s.id}">
                     <div class="face">${s.face}</div>
                     <div class="name">${esc(s.name)}</div>
-                    <span class="tag">${STATUS_LABEL[st]}</span>
+                    <span class="tag">${{ present: W('등원', '출석'), absent: '결석', unknown: '확인 전' }[st]}</span>
                 </button>`;
             }).join('');
         }
@@ -811,16 +1015,16 @@
     };
 
     // ===== 일과표 =====
-    const currentIndex = () => state.schedule.findIndex(s => !s.done);
+    const currentIndex = () => curSched().findIndex(s => !s.done);
 
     function renderSchedule() {
         const list = $('sched-list');
         const cur = currentIndex();
-        if (!state.schedule.length) {
+        if (!curSched().length) {
             list.innerHTML = `<div class="empty card"><span class="big">🗓️</span>아래에서 오늘 할 활동을 추가해 주세요.</div>`;
             return;
         }
-        list.innerHTML = state.schedule.map((s, i) => `
+        list.innerHTML = curSched().map((s, i) => `
             <div class="sched ${s.done ? 'done' : ''} ${i === cur ? 'now' : ''}" data-id="${s.id}">
                 <button class="check" data-act="toggle" title="완료 표시">${s.done ? '✓' : ''}</button>
                 <div class="emoji">${esc(s.emoji)}</div>
@@ -838,15 +1042,15 @@
     $('sched-list').addEventListener('click', e => {
         const b = e.target.closest('button[data-act]');
         if (!b) return;
-        const i = state.schedule.findIndex(s => s.id === b.closest('.sched').dataset.id);
-        const item = state.schedule[i];
+        const i = curSched().findIndex(s => s.id === b.closest('.sched').dataset.id);
+        const item = curSched()[i];
         const act = b.dataset.act;
         if (act === 'toggle') { item.done = !item.done; if (item.done) sounds.pop(); }
-        if (act === 'up' && i > 0) [state.schedule[i - 1], state.schedule[i]] = [state.schedule[i], state.schedule[i - 1]];
-        if (act === 'down' && i < state.schedule.length - 1) [state.schedule[i + 1], state.schedule[i]] = [state.schedule[i], state.schedule[i + 1]];
+        if (act === 'up' && i > 0) [curSched()[i - 1], curSched()[i]] = [curSched()[i], curSched()[i - 1]];
+        if (act === 'down' && i < curSched().length - 1) [curSched()[i + 1], curSched()[i]] = [curSched()[i], curSched()[i + 1]];
         if (act === 'del') {
             if (!confirm(`'${item.title}' 활동을 지울까요?`)) return;
-            state.schedule.splice(i, 1);
+            curSched().splice(i, 1);
         }
         save(); renderSchedule();
     });
@@ -854,8 +1058,8 @@
     function addSchedule(emoji, title, time) {
         title = title.trim();
         if (!title) { toast('활동 이름을 적어 주세요'); return; }
-        state.schedule.push({ id: uid(), emoji: emoji.trim() || '📌', title, time: time || '', done: false });
-        state.schedule.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+        curSched().push({ id: uid(), emoji: emoji.trim() || '📌', title, time: time || '', done: false });
+        curSched().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
         save(); renderSchedule();
         toast(`'${title}' 활동을 넣었어요`);
     }
@@ -863,7 +1067,10 @@
         addSchedule($('sched-emoji').value, $('sched-title').value, $('sched-time').value);
         $('sched-emoji').value = ''; $('sched-title').value = ''; $('sched-time').value = '';
     };
-    $('sched-presets').innerHTML = SCHED_PRESETS.map(([e, t]) => `<button class="chip" data-e="${e}" data-t="${t}">${e} ${t}</button>`).join('');
+    function renderSchedPresets() {
+        $('sched-presets').innerHTML = W(SCHED_PRESETS, SCHED_PRESETS_E).map(([e, t]) => `<button class="chip" data-e="${e}" data-t="${t}">${e} ${t}</button>`).join('');
+        $('sched-title').placeholder = W('활동 이름 (예: 자유놀이)', '교시·과목 (예: 1교시 국어)');
+    }
     $('sched-presets').addEventListener('click', e => {
         const b = e.target.closest('.chip');
         if (!b) return;
@@ -874,12 +1081,12 @@
     $('btn-sched-next').onclick = () => {
         const i = currentIndex();
         if (i === -1) { toast('오늘 일과를 모두 마쳤어요!'); return; }
-        state.schedule[i].done = true;
+        curSched()[i].done = true;
         save(); renderSchedule(); sounds.chime();
         if (currentIndex() === -1) confetti();
         if ($('overlay').classList.contains('show') && overlayMode === 'schedule') showSchedule();
     };
-    $('btn-sched-reset').onclick = () => { state.schedule.forEach(s => s.done = false); save(); renderSchedule(); };
+    $('btn-sched-reset').onclick = () => { curSched().forEach(s => s.done = false); save(); renderSchedule(); };
 
     // ===== 크게 보여주기 =====
     let overlayMode = null;
@@ -901,7 +1108,7 @@
         if (i === -1) {
             c.innerHTML = `<div class="show-emoji">🎉</div><div class="show-title">오늘도 참 잘했어요!</div>`;
         } else {
-            const s = state.schedule[i], n = state.schedule[i + 1];
+            const s = curSched()[i], n = curSched()[i + 1];
             c.innerHTML = `<div class="show-label">지금은</div>
                 <div class="show-emoji">${esc(s.emoji)}</div>
                 <div class="show-title">${esc(s.title)}</div>
@@ -969,8 +1176,11 @@
         if (b) setTimer(+b.dataset.min * 60);
     });
     document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => setTimer(timer.total + +b.dataset.step));
-    $('timer-label-presets').innerHTML = ['정리 시간', '손 씻기', '간식 먹기', '자유놀이', '조용히 쉬기', '양치하기']
-        .map(t => `<button class="chip">${t}</button>`).join('');
+    function renderTimerPresets() {
+        $('timer-label-presets').innerHTML = W(['정리 시간', '손 씻기', '간식 먹기', '자유놀이', '조용히 쉬기', '양치하기'],
+            ['모둠 활동', '발표 준비', '문제 풀기', '독서 시간', '쉬는 시간', '정리 시간'])
+            .map(t => `<button class="chip">${t}</button>`).join('');
+    }
     $('timer-label-presets').addEventListener('click', e => {
         const b = e.target.closest('.chip');
         if (b) { $('timer-label').value = b.textContent; renderTimer(); }
@@ -1104,6 +1314,7 @@
     // ===== 설정 =====
     function renderSettings() {
         $('class-name').value = state.className;
+        $('grade').value = state.grade;
         $('roster-count').textContent = `(${state.students.length}명)`;
         $('roster').innerHTML = state.students.length ? state.students.map(s => `
             <div class="roster-item" data-id="${s.id}">
@@ -1112,6 +1323,7 @@
                 <button class="del" data-act="del" title="명단에서 빼기">✕</button>
             </div>`).join('') : '<p class="hint">왼쪽에서 친구 이름을 넣어 주세요.</p>';
     }
+    $('grade').onchange = () => { state.grade = +$('grade').value; save(); newPattern(); };
     $('class-name').oninput = () => { state.className = $('class-name').value.trim(); save(); renderHeader(); };
     $('btn-roster-add').onclick = () => {
         const used = new Set(state.students.map(s => s.name));
@@ -1138,6 +1350,9 @@
             delete state.stickers[id];
             Object.values(state.attendance).forEach(day => delete day[id]);
             state.observations = state.observations.filter(o => o.studentId !== id);
+            state.reflections = state.reflections.filter(r => r.studentId !== id);
+            state.groups.list.forEach(g => { g.members = g.members.filter(m => m !== id); if (g.leader === id) g.leader = null; });
+            state.roleOrder = state.roleOrder.filter(x => x !== id);
             picked = picked.filter(x => x !== id);
         }
         save(); renderSettings();
@@ -1184,23 +1399,39 @@
 
     // ===== 관찰 기록 =====
     // 2019 개정 누리과정 5개 영역
-    const AREAS = [
+    const AREAS_K = [
         { key: 'body', name: '신체운동·건강', color: '#4cb782', phrases: ['균형을 잡으며 평균대를 끝까지 걸었어요.', '스스로 손을 깨끗이 씻었어요.', '여러 가지 음식을 골고루 먹었어요.', '공을 두 손으로 받아 보려고 여러 번 시도했어요.'] },
         { key: 'talk', name: '의사소통', color: '#5b9dff', phrases: ['그림책을 보며 이야기를 지어 말했어요.', '친구의 말을 끝까지 듣고 대답했어요.', '자기 이름의 글자를 찾아 써 보았어요.', '놀이 중 필요한 것을 말로 요청했어요.'] },
         { key: 'social', name: '사회관계', color: '#f4b740', phrases: ['친구에게 놀잇감을 양보했어요.', '속상한 친구를 다가가 위로해 주었어요.', '차례를 기다려 놀이에 참여했어요.', '친구와 역할을 나누어 함께 놀이했어요.'] },
         { key: 'art', name: '예술경험', color: '#e5646a', phrases: ['여러 색을 섞어 새로운 색을 만들었어요.', '노래에 맞춰 몸으로 자유롭게 표현했어요.', '자연물로 작품을 꾸몄어요.', '친구의 작품을 보고 좋은 점을 말했어요.'] },
         { key: 'nature', name: '자연탐구', color: '#9b6bdf', phrases: ['블록이 무너지지 않게 쌓는 방법을 여러 번 시도했어요.', '개미의 움직임을 오래 관찰했어요.', '물건을 크기 순서대로 늘어놓았어요.', '물에 뜨는 것과 가라앉는 것을 나누어 보았어요.'] }
     ];
-    const areaOf = k => AREAS.find(a => a.key === k);
+    // 초등 생활 기록 영역
+    const AREAS_E = [
+        { key: 'study', name: '교과 학습', color: '#5b9dff', phrases: ['수업 시간에 자기 생각을 근거를 들어 발표했어요.', '어려운 문제도 끝까지 해결하려고 노력했어요.', '배운 내용을 친구에게 차근차근 설명해 주었어요.', '과제를 빠짐없이 성실하게 해 왔어요.'] },
+        { key: 'life', name: '생활 습관', color: '#4cb782', phrases: ['자기 자리를 깨끗하게 정리했어요.', '시간을 지켜 활동을 시작했어요.', '급식을 골고루 먹고 뒷정리를 잘했어요.', '맡은 1인 1역을 책임감 있게 해냈어요.'] },
+        { key: 'friend', name: '교우 관계', color: '#f4b740', phrases: ['모둠 활동에서 친구의 의견을 존중했어요.', '갈등이 생겼을 때 차분하게 대화로 해결했어요.', '도움이 필요한 친구를 먼저 도와주었어요.', '친구의 좋은 점을 찾아 칭찬했어요.'] },
+        { key: 'cre', name: '창의적 체험활동', color: '#9b6bdf', phrases: ['학급 회의에서 적극적으로 의견을 냈어요.', '동아리 활동에 즐겁게 참여했어요.', '봉사 활동에 성실하게 참여했어요.', '새로운 아이디어로 문제를 해결했어요.'] },
+        { key: 'career', name: '진로·특기', color: '#e5646a', phrases: ['관심 있는 분야를 스스로 찾아 탐구했어요.', '그림·음악 등 예술 활동에서 재능을 보였어요.', '체육 활동에서 끈기 있게 연습했어요.', '장래 희망에 대해 구체적으로 이야기했어요.'] }
+    ];
+    const areasNow = () => W(AREAS_K, AREAS_E);
+    const areaOf = k => [...AREAS_K, ...AREAS_E].find(a => a.key === k) || { name: k, color: '#999' };
     const studentOf = id => state.students.find(s => s.id === id);
     const obsSel = { kids: new Set(), areas: new Set() };
     $('obs-date').value = todayKey();
     $('notice-date').value = todayKey();
 
-    $('obs-areas').innerHTML = AREAS.map(a => `<button class="area" data-area="${a.key}" style="--a:${a.color}">${a.name}</button>`).join('');
-    $('obs-phrases').innerHTML = AREAS.flatMap(a => a.phrases.map(p =>
-        `<button data-area="${a.key}"><span class="area-tag" style="--a:${a.color}">${a.name}</span>${p}</button>`)).join('');
-    $('obs-filter-area').innerHTML = '<option value="">모든 영역</option>' + AREAS.map(a => `<option value="${a.key}">${a.name}</option>`).join('');
+    function renderObsStatic() {
+        const areas = areasNow();
+        $('obs-areas').innerHTML = areas.map(a => `<button class="area" data-area="${a.key}" style="--a:${a.color}">${a.name}</button>`).join('');
+        $('obs-phrases').innerHTML = areas.flatMap(a => a.phrases.map(p =>
+            `<button data-area="${a.key}"><span class="area-tag" style="--a:${a.color}">${a.name}</span>${p}</button>`)).join('');
+        const fa = $('obs-filter-area'), keep = fa.value;
+        fa.innerHTML = '<option value="">모든 영역</option>' + areas.map(a => `<option value="${a.key}">${a.name}</option>`).join('');
+        fa.value = areas.some(a => a.key === keep) ? keep : '';
+        $('notice-play').placeholder = W('예) 오늘은 가을 나뭇잎을 모아 색깔별로 나누어 보았어요.', '예) 수학 시간에 분수의 크기를 비교하는 놀이를 했어요.');
+        $('notice-items').placeholder = W('예) 여벌 옷, 물통', '예) 리코더, 색연필');
+    }
 
     function renderObsAreas() {
         document.querySelectorAll('#obs-areas .area').forEach(b => b.classList.toggle('on', obsSel.areas.has(b.dataset.area)));
@@ -1241,6 +1472,8 @@
     };
 
     function renderObserve() {
+        renderObsStatic();
+        renderReflect();
         // 친구 고르기
         $('obs-kids').innerHTML = state.students.length
             ? state.students.map(s => `<button data-id="${s.id}" class="${obsSel.kids.has(s.id) ? 'on' : ''}">${s.face} ${esc(s.name)}</button>`).join('')
@@ -1255,6 +1488,7 @@
 
         // 영역 균형
         const pool = state.observations.filter(o => !kid || o.studentId === kid);
+        const AREAS = areasNow();
         const counts = AREAS.map(a => pool.filter(o => o.areas.includes(a.key)).length);
         const max = Math.max(1, ...counts);
         $('obs-balance').innerHTML = AREAS.map((a, i) => `
@@ -1312,26 +1546,34 @@
         const kid = studentOf($('notice-kid').value);
         const cls = state.className || '우리 반';
         const lines = [`[${cls} 알림장] ${m}월 ${d}일 ${day}요일`, ''];
-        lines.push(kid ? `안녕하세요, ${kid.name} 어린이 보호자님.` : '안녕하세요, 보호자님.');
+        const who = W('어린이', '학생');
+        lines.push(kid ? `안녕하세요, ${kid.name} ${who} 보호자님.` : '안녕하세요, 보호자님.');
         lines.push(`오늘 ${cls}의 하루를 전해 드립니다.`);
 
-        if ($('notice-sched').checked && state.schedule.length) {
-            lines.push('', '🌈 오늘의 일과', state.schedule.map(s => `${s.emoji} ${s.title}`).join(' → '));
+        if ($('notice-sched').checked && curSched().length) {
+            lines.push('', W('🌈 오늘의 일과', '📚 오늘의 시간표'), curSched().map(s => `${s.emoji} ${s.title}`).join(' → '));
         }
         const play = $('notice-play').value.trim();
-        if (play) lines.push('', '🧸 오늘의 놀이', play);
+        if (play) lines.push('', W('🧸 오늘의 놀이', '✏️ 오늘의 배움'), play);
         if (kid && $('notice-obs').checked) {
             const obs = state.observations.filter(o => o.studentId === kid.id && o.date === k);
             if (obs.length) {
-                lines.push('', `💛 ${kid.name} 어린이의 놀이 모습`);
+                lines.push('', W(`💛 ${kid.name} 어린이의 놀이 모습`, `💛 ${kid.name} 학생의 학교생활`));
                 obs.forEach(o => lines.push(`- ${o.text}`));
+            }
+        }
+        if (kid && isElem() && $('notice-ref').checked) {
+            const refs = state.reflections.filter(r => r.studentId === kid.id && r.date === k);
+            if (refs.length) {
+                lines.push('', `🗨️ ${kid.name} 학생이 쓴 오늘의 한마디`);
+                refs.forEach(r => lines.push(`- ${r.mood} ${r.prompt} → "${r.text}"`));
             }
         }
         const info = $('notice-info').value.trim();
         if (info) lines.push('', '📢 알려 드려요', info);
         const items = $('notice-items').value.trim();
         if (items) lines.push('', `🎒 준비물: ${items}`);
-        lines.push('', '오늘도 아이와 함께해 주셔서 감사합니다.', `${cls} 담임교사 드림`);
+        lines.push('', W('오늘도 아이와 함께해 주셔서 감사합니다.', '오늘도 학생과 함께해 주셔서 감사합니다.'), `${cls} 담임교사 드림`);
         return lines.join('\n');
     }
     $('btn-notice-make').onclick = () => { $('notice-out').value = makeNotice(); toast('알림장 글을 만들었어요'); };
@@ -1476,7 +1718,7 @@
         const r = wavePad.getBoundingClientRect();
         wave.x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
         wave.y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-        $('wave-state').textContent = `${wave.x > 0.5 ? '높은' : '낮은'} 소리 · ${wave.y < 0.5 ? '큰' : '작은'} 소리`;
+        $('wave-state').textContent = `${wave.x > 0.5 ? '높은' : '낮은'} 소리 · ${wave.y < 0.5 ? '큰' : '작은'} 소리` + (isElem() ? ` · ${Math.round(waveFreq())}Hz` : '');
         if (wave.osc) {
             wave.osc.frequency.setTargetAtTime(waveFreq(), audioCtx.currentTime, 0.02);
             wave.gain.gain.setTargetAtTime(waveVol(), audioCtx.currentTime, 0.02);
@@ -1513,10 +1755,12 @@
     // ===== STEAM: 패턴 놀이 =====
     const PATTERN_SETS = [['🍎', '🍌', '🍇', '🍓'], ['🐶', '🐱', '🐰', '🐻'], ['🔴', '🟡', '🔵', '🟢'], ['⭐', '🌙', '☀️', '☁️'], ['🚗', '🚌', '🚲', '✈️']];
     const PATTERN_RULES = ['AB', 'AB', 'AAB', 'ABB', 'ABC'];
-    const pattern = { answer: null, unit: [], score: 0, solved: false };
+    const pattern = { answer: null, rule: '', score: 0, solved: false };
     const shuffle = arr => arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
 
     function newPattern() {
+        const g = +state.grade || 3;
+        if (isElem() && (g >= 3 || Math.random() < 0.5)) return numberPattern(g);
         const set = shuffle(PATTERN_SETS[Math.floor(Math.random() * PATTERN_SETS.length)]);
         const rule = PATTERN_RULES[Math.floor(Math.random() * PATTERN_RULES.length)];
         const letters = [...new Set(rule)];
@@ -1524,8 +1768,9 @@
         const full = [...unit, ...unit, ...unit];
         const cut = unit.length * 2 + Math.floor(Math.random() * unit.length);
         pattern.answer = full[cut];
-        pattern.unit = unit;
+        pattern.rule = `${unit.join('')} 순서가 반복돼요.`;
         pattern.solved = false;
+        pattern.numeric = false;
         const options = letters.map((_, i) => set[i]);
         options.push(set[letters.length]);
         $('pattern-row').innerHTML = full.slice(0, cut).map(x => `<span>${x}</span>`).join('') + '<span class="q">?</span>';
@@ -1540,8 +1785,10 @@
             pattern.score++;
             b.classList.add('right');
             $('pattern-score').textContent = `⭐ ${pattern.score}`;
-            document.querySelector('#pattern-row .q').outerHTML = `<span>${pattern.answer}</span>`;
-            $('pattern-msg').textContent = `딩동댕! ${pattern.unit.join('')} 순서가 반복돼요.`;
+            const q = document.querySelector('#pattern-row .q');
+            q.className = pattern.numeric ? 'num' : '';
+            q.textContent = pattern.answer;
+            $('pattern-msg').textContent = `딩동댕! ${pattern.rule}`;
             sounds.chime();
             if (pattern.score % 5 === 0) confetti(30);
             setTimeout(() => { if (pattern.solved && $('panel-steam').classList.contains('active')) newPattern(); }, 2200);
@@ -1552,6 +1799,47 @@
         }
     });
     $('btn-pattern-next').onclick = newPattern;
+
+    // 학년에 맞춘 수의 규칙 (1~2학년: 뛰어 세기, 3~4학년: 덧셈·뺄셈·곱셈 규칙, 5~6학년: 제곱수·계차 규칙까지)
+    function numberPattern(g) {
+        const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+        const kinds = g <= 2 ? ['skip'] : g <= 4 ? ['add', 'add', 'sub', 'mul', 'alt'] : ['add', 'sub', 'mul', 'alt', 'square', 'tri'];
+        const kind = kinds[ri(0, kinds.length - 1)];
+        let seq = [], ans, rule;
+        if (kind === 'skip') {
+            const d = [2, 5, 10][ri(0, 2)], a = d * ri(0, 5);
+            seq = [0, 1, 2, 3, 4].map(i => a + d * i); ans = a + d * 5; rule = `${d}씩 뛰어 세었어요.`;
+        } else if (kind === 'add') {
+            const d = ri(2, g <= 4 ? 9 : 25), a = ri(1, 30);
+            seq = [0, 1, 2, 3, 4].map(i => a + d * i); ans = a + d * 5; rule = `${d}씩 커지는 규칙이에요.`;
+        } else if (kind === 'sub') {
+            const d = ri(2, 9), a = d * 5 + ri(5, 40);
+            seq = [0, 1, 2, 3, 4].map(i => a - d * i); ans = a - d * 5; rule = `${d}씩 작아지는 규칙이에요.`;
+        } else if (kind === 'mul') {
+            const r = ri(2, 3), a = ri(1, 3);
+            seq = [0, 1, 2, 3].map(i => a * r ** i); ans = a * r ** 4; rule = `${r}배씩 커지는 규칙이에요.`;
+        } else if (kind === 'alt') {
+            const p = ri(1, 5), q = ri(p + 1, 9);
+            seq = [ri(1, 20)];
+            for (let i = 0; i < 4; i++) seq.push(seq[i] + (i % 2 ? q : p));
+            ans = seq[4] + p; rule = `${p}과(와) ${q}를 번갈아 더하는 규칙이에요.`;
+        } else if (kind === 'square') {
+            const b = ri(1, 4);
+            seq = [0, 1, 2, 3, 4].map(i => (b + i) ** 2); ans = (b + 5) ** 2; rule = '같은 수를 두 번 곱한 수예요. (예: 3×3=9)';
+        } else {
+            const b = ri(1, 3), tri = n => n * (n + 1) / 2;
+            seq = [0, 1, 2, 3, 4].map(i => tri(b + i)); ans = tri(b + 5); rule = '더하는 수가 1씩 커지는 규칙이에요.';
+        }
+        const last = seq[seq.length - 1], step = ans - last;
+        const wrong = [...new Set([ans + 1, ans - 1, ans + step, last + step * 2, ans + 2, ans - 2])].filter(v => v >= 0 && v !== ans).slice(0, 3);
+        pattern.answer = String(ans);
+        pattern.rule = rule;
+        pattern.numeric = true;
+        pattern.solved = false;
+        $('pattern-row').innerHTML = seq.map(x => `<span class="num">${x}</span>`).join('') + '<span class="q">?</span>';
+        $('pattern-choices').innerHTML = shuffle([ans, ...wrong]).map(o => `<button class="num-choice" data-v="${o}">${o}</button>`).join('');
+        $('pattern-msg').textContent = '';
+    }
 
     $('btn-steam-full').onclick = () => {
         const el = $('panel-steam');
@@ -1566,6 +1854,214 @@
         startWaveLoop();
     }
 
+    // ===== 모둠 편성 =====
+    const GROUP_LOOK = [['🍎', '#e5646a'], ['🍊', '#ff8a5b'], ['🍋', '#e0a91b'], ['🍏', '#4cb782'], ['🫐', '#5b9dff'], ['🍇', '#9b6bdf'], ['🍑', '#e56fb0'], ['🥥', '#8a6d4b'], ['🍉', '#3fb5c9'], ['🥝', '#6aa84f']];
+    const presentIds = () => {
+        const day = state.attendance[todayKey()] || {};
+        const present = state.students.filter(s => day[s.id] === 'present');
+        return present.length ? present : state.students;
+    };
+    function groupCards(big) {
+        return state.groups.list.map((g, gi) => {
+            const [icon, color] = GROUP_LOOK[gi % GROUP_LOOK.length];
+            const members = g.members.map(studentOf).filter(Boolean);
+            return `<div class="group-card" style="--g:${color}" data-gi="${gi}">
+                <h4>${icon} ${gi + 1}모둠 <span class="hint" style="font-size:14px">${members.length}명</span></h4>
+                <div class="members">${members.map(m => `<span class="member ${g.leader === m.id ? 'leader' : ''}">${g.leader === m.id ? '⭐ ' : ''}${m.face} ${esc(m.name)}</span>`).join('')}</div>
+                <div class="group-score">
+                    ${big ? '' : '<button class="btn small" data-gact="minus">−</button>'}
+                    <b>${g.score}점</b>
+                    ${big ? '' : '<button class="btn small primary" data-gact="plus">+ 1점</button>'}
+                </div>
+            </div>`;
+        }).join('');
+    }
+    function renderGroups() {
+        const gs = state.groups;
+        $('grp-mode').value = gs.mode;
+        $('grp-n').textContent = gs.n;
+        $('grp-unit').textContent = gs.mode === 'count' ? '모둠' : '명씩';
+        $('grp-grid').innerHTML = !state.students.length ? emptyRoster('친구를 등록하면 모둠을 만들 수 있어요.')
+            : gs.list.length ? groupCards(false)
+            : '<div class="empty card" style="grid-column:1/-1"><span class="big">👥</span>"모둠 만들기"를 누르면 무작위로 모둠이 나뉘어요.</div>';
+        if (overlayMode === 'groups') $('overlay-content').innerHTML = `<div class="group-grid">${groupCards(true)}</div>`;
+    }
+    $('grp-mode').onchange = () => { state.groups.mode = $('grp-mode').value; save(); renderGroups(); };
+    document.querySelectorAll('[data-gstep]').forEach(b => b.onclick = () => {
+        state.groups.n = Math.min(12, Math.max(2, state.groups.n + +b.dataset.gstep));
+        save(); renderGroups();
+    });
+    $('btn-grp-make').onclick = () => {
+        if (!state.students.length) { toast('먼저 우리 반 친구를 등록해 주세요'); return; }
+        const pool = shuffle(($('grp-present').checked ? presentIds() : state.students).map(s => s.id));
+        const { mode, n } = state.groups;
+        const k = Math.max(1, Math.min(pool.length, mode === 'count' ? n : Math.ceil(pool.length / n)));
+        const list = Array.from({ length: k }, () => ({ members: [], leader: null, score: 0 }));
+        pool.forEach((id, i) => list[i % k].members.push(id));
+        if ($('grp-leader').checked) list.forEach(g => g.leader = g.members[Math.floor(Math.random() * g.members.length)] || null);
+        state.groups.list = list;
+        save(); renderGroups(); sounds.chime();
+        toast(`${pool.length}명을 ${k}모둠으로 나눴어요`);
+    };
+    $('grp-grid').addEventListener('click', e => {
+        const b = e.target.closest('button[data-gact]');
+        if (!b) return;
+        const g = state.groups.list[+b.closest('.group-card').dataset.gi];
+        g.score = Math.max(0, g.score + (b.dataset.gact === 'plus' ? 1 : -1));
+        if (b.dataset.gact === 'plus') sounds.pop();
+        save(); renderGroups();
+    });
+    $('btn-grp-reset').onclick = () => {
+        if (!confirm('모든 모둠 점수를 0으로 바꿀까요?')) return;
+        state.groups.list.forEach(g => g.score = 0); save(); renderGroups();
+    };
+    $('btn-grp-show').onclick = () => {
+        if (!state.groups.list.length) { toast('먼저 모둠을 만들어 주세요'); return; }
+        openOverlay('groups'); renderGroups();
+    };
+
+    // ===== 1인 1역 =====
+    // 학생 순서(roleOrder)를 한 칸씩 밀어서 역할을 돌린다. 새로 들어온 학생은 순서 끝에 붙는다.
+    function roleOrderNow() {
+        const ids = state.students.map(s => s.id);
+        const order = state.roleOrder.filter(id => ids.includes(id));
+        ids.forEach(id => { if (!order.includes(id)) order.push(id); });
+        return order;
+    }
+    function roleAssign() {
+        const order = roleOrderNow(), n = order.length;
+        return state.roles.map((r, i) => ({ role: r, sid: n ? order[(i + state.roleOffset) % n] : null }));
+    }
+    function roleCards(big) {
+        const done = state.roleDone[todayKey()] || {};
+        return roleAssign().map(({ role, sid }) => {
+            const s = studentOf(sid);
+            return `<div class="role-card ${done[role.id] ? 'done' : ''}" data-id="${role.id}">
+                <div class="role-name"><span class="emoji">${esc(role.emoji)}</span>${esc(role.name)}
+                    ${big ? '' : '<button class="del" title="역할 지우기">✕</button>'}</div>
+                <div class="who">${s ? s.face + ' ' + esc(s.name) : '—'}</div>
+                <div class="hint">${done[role.id] ? '✅ 오늘 완료!' : (big ? '' : '누르면 완료 표시')}</div>
+            </div>`;
+        }).join('');
+    }
+    function renderRoles() {
+        const assign = roleAssign();
+        const done = state.roleDone[todayKey()] || {};
+        const doneCount = state.roles.filter(r => done[r.id]).length;
+        $('role-info').textContent = state.roles.length ? `오늘 ${doneCount} / ${state.roles.length}개 역할 완료` : '';
+        $('role-grid').innerHTML = !state.students.length ? emptyRoster('친구를 등록하면 역할을 나눌 수 있어요.')
+            : state.roles.length ? roleCards(false)
+            : '<div class="empty card" style="grid-column:1/-1"><span class="big">🧹</span>아래에서 역할을 추가해 주세요.</div>';
+        const busy = new Set(assign.map(a => a.sid));
+        const rest = state.students.filter(s => !busy.has(s.id));
+        $('role-rest-card').style.display = rest.length && state.roles.length ? '' : 'none';
+        $('role-rest').innerHTML = rest.map(s => `<span class="chip">${s.face} ${esc(s.name)}</span>`).join('');
+        $('role-presets').innerHTML = ROLE_PRESETS.filter(([, n]) => !state.roles.some(r => r.name === n))
+            .map(([e, n]) => `<button class="chip" data-e="${e}" data-n="${n}">${e} ${n}</button>`).join('');
+        if (overlayMode === 'roles') $('overlay-content').innerHTML = `<div class="role-grid">${roleCards(true)}</div>`;
+    }
+    $('role-grid').addEventListener('click', e => {
+        const card = e.target.closest('.role-card');
+        if (!card) return;
+        const id = card.dataset.id;
+        if (e.target.closest('.del')) {
+            const r = state.roles.find(x => x.id === id);
+            if (!confirm(`'${r.name}' 역할을 지울까요?`)) return;
+            state.roles = state.roles.filter(x => x.id !== id);
+        } else {
+            const day = state.roleDone[todayKey()] || (state.roleDone[todayKey()] = {});
+            day[id] = !day[id];
+            if (day[id]) sounds.pop();
+            if (state.roles.every(r => day[r.id])) { confetti(40); toast('🎉 오늘 모든 역할을 마쳤어요!'); }
+        }
+        save(); renderRoles();
+    });
+    $('btn-role-shuffle').onclick = () => {
+        if (!state.students.length) { toast('먼저 우리 반 친구를 등록해 주세요'); return; }
+        state.roleOrder = shuffle(state.students.map(s => s.id));
+        state.roleOffset = 0;
+        save(); renderRoles(); sounds.chime(); toast('역할을 무작위로 정했어요');
+    };
+    $('btn-role-rotate').onclick = () => {
+        const n = roleOrderNow().length;
+        if (!n) { toast('먼저 우리 반 친구를 등록해 주세요'); return; }
+        state.roleOrder = roleOrderNow();
+        state.roleOffset = (state.roleOffset + 1) % n;
+        save(); renderRoles(); sounds.chime(); toast('모든 친구의 역할이 한 칸씩 바뀌었어요');
+    };
+    $('btn-role-show').onclick = () => { openOverlay('roles'); renderRoles(); };
+    function addRole(emoji, name) {
+        name = name.trim();
+        if (!name) { toast('역할 이름을 적어 주세요'); return; }
+        state.roles.push({ id: uid(), emoji: emoji.trim() || '📌', name });
+        save(); renderRoles();
+    }
+    $('btn-role-add').onclick = () => { addRole($('role-emoji').value, $('role-name').value); $('role-emoji').value = ''; $('role-name').value = ''; };
+    $('role-presets').addEventListener('click', e => {
+        const b = e.target.closest('.chip');
+        if (b) addRole(b.dataset.e, b.dataset.n);
+    });
+
+    // ===== 학생 소감 =====
+    const MOODS = ['😆', '🙂', '😐', '😥', '😠'];
+    const REF_PROMPTS = ['오늘 가장 기억에 남는 일은?', '오늘 새롭게 알게 된 것은?', '오늘 친구에게 고마웠던 일은?', '오늘 수업에서 궁금해진 것은?', '내일 더 잘하고 싶은 것은?'];
+    const refSel = { kid: null, mood: null };
+    $('ref-date').value = todayKey();
+    $('ref-moods').innerHTML = MOODS.map(m => `<button data-m="${m}">${m}</button>`).join('');
+    $('ref-prompt').innerHTML = REF_PROMPTS.map(p => `<option>${p}</option>`).join('');
+    function renderReflect() {
+        $('ref-kids').innerHTML = state.students.length
+            ? state.students.map(s => `<button data-id="${s.id}" class="${refSel.kid === s.id ? 'on' : ''}">${s.face} ${esc(s.name)}</button>`).join('')
+            : '<span class="hint">설정 탭에서 우리 반 친구를 먼저 등록해 주세요.</span>';
+        document.querySelectorAll('#ref-moods button').forEach(b => b.classList.toggle('on', b.dataset.m === refSel.mood));
+        const date = $('ref-date').value || todayKey();
+        const list = state.reflections.filter(r => r.date === date);
+        $('ref-mood-sum').innerHTML = list.length ? MOODS.map(m => `<span>${m} ${list.filter(r => r.mood === m).length}</span>`).join('') : '';
+        const wrote = new Set(list.map(r => r.studentId));
+        const missing = state.students.filter(s => !wrote.has(s.id));
+        $('ref-missing').textContent = state.students.length && list.length ? (missing.length ? `아직 안 쓴 친구: ${missing.map(s => s.name).join(', ')}` : '모든 친구가 소감을 썼어요! 👏') : '';
+        $('ref-list').innerHTML = list.length ? list.map(r => {
+            const s = studentOf(r.studentId);
+            return `<div class="obs-item" data-id="${r.id}">
+                <div class="meta"><b>${s ? s.face + ' ' + esc(s.name) : '(삭제된 친구)'}</b><span style="font-size:20px">${r.mood}</span><span>${esc(r.prompt)}</span>
+                    <button class="del" title="지우기">지우기</button></div>
+                <div class="text">${esc(r.text)}</div>
+            </div>`;
+        }).join('') : '<div class="empty"><span class="big">✏️</span>이 날짜에 쓴 소감이 없어요.</div>';
+    }
+    $('ref-kids').addEventListener('click', e => {
+        const b = e.target.closest('button[data-id]');
+        if (!b) return;
+        refSel.kid = refSel.kid === b.dataset.id ? null : b.dataset.id;
+        renderReflect();
+    });
+    $('ref-moods').addEventListener('click', e => {
+        const b = e.target.closest('button[data-m]');
+        if (!b) return;
+        refSel.mood = b.dataset.m; renderReflect();
+    });
+    $('ref-date').onchange = renderReflect;
+    $('btn-ref-save').onclick = () => {
+        const text = $('ref-text').value.trim();
+        if (!refSel.kid) { toast('먼저 내 이름을 눌러 주세요'); return; }
+        if (!refSel.mood) { toast('오늘 기분을 골라 주세요'); return; }
+        if (!text) { toast('소감을 한 줄 적어 주세요'); return; }
+        const s = studentOf(refSel.kid);
+        state.reflections.push({ id: uid(), date: todayKey(), studentId: refSel.kid, mood: refSel.mood, prompt: $('ref-prompt').value, text });
+        refSel.kid = null; refSel.mood = null;
+        $('ref-text').value = '';
+        $('ref-date').value = todayKey();
+        save(); renderReflect(); sounds.chime();
+        toast(`${s.name}, 소감을 잘 썼어요! 👏`);
+    };
+    $('ref-list').addEventListener('click', e => {
+        const b = e.target.closest('.del');
+        if (!b || !confirm('이 소감을 지울까요?')) return;
+        const id = b.closest('.obs-item').dataset.id;
+        state.reflections = state.reflections.filter(r => r.id !== id);
+        save(); renderReflect();
+    });
+
     // ===== 시작 =====
     function renderAll() {
         renderHeader();
@@ -1574,6 +2070,10 @@
         renderTimer();
         renderPicker();
         renderStickers();
+        renderSchedPresets();
+        renderTimerPresets();
+        renderGroups();
+        renderRoles();
         renderObserve();
         if ($('panel-steam').classList.contains('active')) renderSteam();
         renderSettings();
