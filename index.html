@@ -293,6 +293,42 @@
         .level-switch button.on { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
         .head-right { display: flex; align-items: center; gap: 8px; }
 
+        /* 초등 모드 색 (파랑 계열) */
+        body.elem { --bg: #eef4ff; --primary: #4a7dff; --primary-dark: #3563e0; --line: #dbe5f7; }
+        body.elem .sched.now, body.elem .kid-pick button.on, body.elem .moods button.on { background: #e8f0ff; }
+        .mode-badge { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #fff; background: var(--primary); vertical-align: middle; }
+
+        /* 시작 화면: 학교급 고르기 */
+        .level-pick { position: fixed; inset: 0; z-index: 80; background: linear-gradient(135deg, #fff3e3, #e8f0ff); display: none; overflow-y: auto; padding: 24px 16px; }
+        .level-pick.show { display: flex; align-items: center; justify-content: center; }
+        .lp-inner { max-width: 860px; width: 100%; text-align: center; }
+        .lp-inner h2 { font-size: clamp(26px, 5vw, 38px); margin: 8px 0; }
+        .lp-logo { font-size: 56px; }
+        .lp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px; }
+        .lp-card { background: #fff; border-radius: 24px; padding: 24px 20px; box-shadow: 0 10px 30px rgba(60, 60, 120, .12); text-align: left; border: 4px solid transparent; transition: transform .15s, border-color .15s; }
+        .lp-card:hover, .lp-card:focus { transform: translateY(-4px); }
+        .lp-card.kinder:hover, .lp-card.kinder:focus { border-color: #ff8a5b; }
+        .lp-card.elem:hover, .lp-card.elem:focus { border-color: #4a7dff; }
+        .lp-card .big { font-size: 64px; display: block; text-align: center; }
+        .lp-card b { display: block; text-align: center; font-size: 28px; margin: 6px 0 4px; }
+        .lp-card .sub { display: block; text-align: center; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+        .lp-card ul { margin: 0; padding-left: 20px; line-height: 1.9; font-size: 16px; }
+        .lp-card .go { display: block; margin-top: 16px; text-align: center; padding: 14px; border-radius: 14px; color: #fff; font-weight: 800; font-size: 18px; }
+        .lp-card.kinder .go { background: #ff8a5b; }
+        .lp-card.elem .go { background: #4a7dff; }
+
+        /* 코딩 길찾기 */
+        .code-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+        .maze { display: grid; gap: 4px; width: min(100%, 440px); margin: 0 auto; }
+        .maze .cell { aspect-ratio: 1; border-radius: 10px; background: #eef2f8; display: flex; align-items: center; justify-content: center; font-size: clamp(20px, 5vw, 34px); transition: background .2s; }
+        .maze .cell.trail { background: #d5e4ff; }
+        .maze .cell.bump { background: var(--red-soft); }
+        .code-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .code-btns button { font-size: 30px; padding: 10px 0; border-radius: 14px; background: var(--bg); }
+        .program { display: flex; flex-wrap: wrap; gap: 6px; min-height: 52px; padding: 8px; border-radius: 12px; border: 2px dashed var(--line); }
+        .program span { font-size: 24px; padding: 2px 4px; border-radius: 8px; }
+        .program span.cur { background: var(--yellow-soft); outline: 2px solid var(--yellow); }
+
         /* 모둠 편성 */
         .group-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
         .group-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; border-top: 8px solid var(--g); animation: pop .4s ease; }
@@ -332,6 +368,7 @@
         @media (max-width: 760px) {
             .obs-grid, .notice-grid { grid-template-columns: 1fr; }
             .level-switch button { padding: 6px 8px; font-size: 13px; }
+            .lp-cards, .code-wrap { grid-template-columns: 1fr; }
             .pot { width: 62px; height: 62px; font-size: 12px; }
             .bar-key { font-size: 15px; }
         }
@@ -350,7 +387,7 @@
 
 <header>
     <div class="brand">
-        <span class="logo">🌈</span>
+        <span class="logo" id="logo">🌈</span>
         <div style="min-width:0">
             <h1 id="class-title">우리 반 하루 도우미</h1>
             <div class="today" id="today-label"></div>
@@ -646,6 +683,7 @@
             <button data-sub="act-mix" class="on">🎨 색 섞기</button>
             <button data-sub="act-sound">🎵 소리 탐색</button>
             <button data-sub="act-pattern"><span data-k>🔷 패턴 놀이</span><span data-e>🔷 규칙 찾기</span></button>
+            <button data-sub="act-code" data-e>🤖 코딩 길찾기</button>
             <span class="spacer"></span>
             <button id="btn-steam-full" style="background:var(--primary);color:#fff">📺 전체 화면</button>
         </div>
@@ -739,12 +777,46 @@
                 </ul>
             </div>
         </div>
+
+        <div class="steam-act" id="act-code">
+            <div class="code-wrap">
+                <div class="card"><div class="maze" id="maze"></div></div>
+                <div class="card stack">
+                    <h3 class="section-title" style="margin:0">🤖 로봇에게 명령하기</h3>
+                    <p class="hint" style="margin:0">로봇이 ⭐까지 가도록 화살표 명령을 순서대로 넣고 실행해 보세요. 🌳는 지나갈 수 없어요.</p>
+                    <div class="code-btns" id="code-btns">
+                        <button data-cmd="U" title="위로">⬆️</button><button data-cmd="D" title="아래로">⬇️</button>
+                        <button data-cmd="L" title="왼쪽으로">⬅️</button><button data-cmd="R" title="오른쪽으로">➡️</button>
+                    </div>
+                    <div class="program" id="program"></div>
+                    <div class="row">
+                        <button class="btn" id="btn-code-undo">↩ 하나 지우기</button>
+                        <button class="btn" id="btn-code-clear">모두 지우기</button>
+                        <span class="spacer"></span>
+                        <button class="btn primary" id="btn-code-run">▶ 실행</button>
+                    </div>
+                    <div class="pattern-msg" id="code-msg" style="margin-top:0"></div>
+                    <button class="btn" id="btn-code-new">🗺️ 새 지도</button>
+                </div>
+            </div>
+            <div class="tip">
+                <h4>👩‍🏫 교사 도움말 · 실과(SW교육), 수학 연계</h4>
+                <ul>
+                    <li>명령을 순서대로 늘어놓는 것이 프로그래밍의 '순차' 구조예요. 실행 전에 손가락으로 길을 따라가며 예상해 보게 하세요.</li>
+                    <li>로봇이 부딪히면 어느 명령에서 틀렸는지 찾아 고치게 해 보세요. 이것이 '디버깅'이에요.</li>
+                    <li>"가장 짧은 길"과 비교하며 더 적은 명령으로 가는 방법을 모둠별로 겨뤄 보세요. 지도 크기는 학년에 따라 커져요.</li>
+                    <li>교실 바닥에 테이프로 칸을 만들고 친구를 로봇 삼아 언플러그드 놀이로 이어 갈 수 있어요.</li>
+                </ul>
+            </div>
+        </div>
     </section>
 
     <!-- 설정 -->
     <section class="panel" id="panel-settings">
         <div class="settings-grid">
             <div class="card">
+                <h3 class="section-title">학교급</h3>
+                <button class="btn" id="btn-level-pick" style="width:100%;margin-bottom:18px">🏫 유치원 / 초등 다시 고르기</button>
                 <h3 class="section-title">우리 반 이름</h3>
                 <input class="field" id="class-name" maxlength="20" placeholder="예: 햇살반, 4학년 2반">
                 <div data-e>
@@ -784,6 +856,36 @@
 </main>
 
 <!-- 크게 보여주기 화면 -->
+<div class="level-pick" id="level-pick">
+    <div class="lp-inner">
+        <div class="lp-logo">🧸 🏫 🎒</div>
+        <h2>어느 학교 선생님이신가요?</h2>
+        <p class="hint" style="font-size:16px">고른 학교급에 맞는 화면과 활동으로 바뀌어요. 나중에 오른쪽 위 버튼이나 설정 탭에서 언제든 바꿀 수 있어요.</p>
+        <div class="lp-cards">
+            <button class="lp-card kinder" data-pick="kinder">
+                <span class="big">🧸</span><b>유치원</b><span class="sub">만 3~5세 · 놀이 중심</span>
+                <ul>
+                    <li>등원 체크와 그림 카드 하루 일과</li>
+                    <li>칭찬 스티커판·이름 뽑기·시각 타이머</li>
+                    <li>누리과정 5개 영역 관찰 기록과 알림장</li>
+                    <li>색 섞기·소리 탐색·패턴 놀이</li>
+                </ul>
+                <span class="go">유치원으로 시작 ▶</span>
+            </button>
+            <button class="lp-card elem" data-pick="elem">
+                <span class="big">🎒</span><b>초등학교</b><span class="sub">1~6학년 · 교과·학급 운영</span>
+                <ul>
+                    <li>교시별 시간표와 교과 버튼</li>
+                    <li>모둠 편성·모둠 점수판·1인 1역</li>
+                    <li>생활 기록, 학생이 쓰는 오늘의 소감</li>
+                    <li>학년별 규칙 찾기·코딩 길찾기</li>
+                </ul>
+                <span class="go">초등으로 시작 ▶</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="overlay" id="overlay">
     <button class="btn close" id="btn-overlay-close">✕ 닫기</button>
     <div id="overlay-content"></div>
@@ -927,25 +1029,42 @@
         const d = new Date();
         const days = ['일', '월', '화', '수', '목', '금', '토'];
         $('today-label').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
-        $('class-title').textContent = state.className ? `${state.className} 하루 도우미` : '우리 반 하루 도우미';
+        $('class-title').innerHTML = `${esc(state.className || '우리 반')} ${W('하루 도우미', '학급 도우미')}<span class="mode-badge">${W('유치원', `초등 ${state.grade}학년`)}</span>`;
+        $('logo').textContent = W('🌈', '🏫');
         $('btn-sound').textContent = state.sound ? '🔔' : '🔕';
         document.body.classList.toggle('elem', isElem());
         document.querySelectorAll('#level-switch button').forEach(b => b.classList.toggle('on', b.dataset.level === state.level));
     }
-    $('level-switch').addEventListener('click', e => {
-        const b = e.target.closest('button[data-level]');
-        if (!b || b.dataset.level === state.level) return;
-        state.level = b.dataset.level;
+    function setLevel(level) {
+        const changed = level !== state.level;
+        state.level = level;
+        state.levelChosen = true;
         obsSel.areas.clear();
         save();
         renderHeader();
-        // 지금 보던 탭이 이 학교급에 없으면 출석 탭으로
+        // 지금 보던 탭이나 하위 탭이 이 학교급에 없으면 첫 화면으로
+        document.querySelectorAll('.seg').forEach(seg => {
+            const on = seg.querySelector('button.on');
+            if (on && getComputedStyle(on).display === 'none') seg.querySelector('button[data-sub]').click();
+        });
         const active = document.querySelector('#tabs button.active');
         if (!active || getComputedStyle(active).display === 'none') document.querySelector('[data-tab=attendance]').click();
         else renderAll();
         newPattern();
-        toast(isElem() ? '🎒 초등 모드로 바꿨어요' : '🧸 유치원 모드로 바꿨어요');
+        newMaze();
+        if (changed) toast(isElem() ? '🎒 초등 모드로 바꿨어요' : '🧸 유치원 모드로 바꿨어요');
+    }
+    $('level-switch').addEventListener('click', e => {
+        const b = e.target.closest('button[data-level]');
+        if (b && b.dataset.level !== state.level) setLevel(b.dataset.level);
     });
+    $('level-pick').addEventListener('click', e => {
+        const b = e.target.closest('[data-pick]');
+        if (!b) return;
+        $('level-pick').classList.remove('show');
+        setLevel(b.dataset.pick);
+    });
+    $('btn-level-pick').onclick = () => $('level-pick').classList.add('show');
     $('btn-sound').onclick = () => {
         state.sound = !state.sound; save(); renderHeader();
         toast(state.sound ? '소리를 켰어요' : '소리를 껐어요');
@@ -1323,7 +1442,7 @@
                 <button class="del" data-act="del" title="명단에서 빼기">✕</button>
             </div>`).join('') : '<p class="hint">왼쪽에서 친구 이름을 넣어 주세요.</p>';
     }
-    $('grade').onchange = () => { state.grade = +$('grade').value; save(); newPattern(); };
+    $('grade').onchange = () => { state.grade = +$('grade').value; save(); renderHeader(); newPattern(); newMaze(); };
     $('class-name').oninput = () => { state.className = $('class-name').value.trim(); save(); renderHeader(); };
     $('btn-roster-add').onclick = () => {
         const used = new Set(state.students.map(s => s.name));
@@ -2062,6 +2181,120 @@
         save(); renderReflect();
     });
 
+    // ===== STEAM: 코딩 길찾기 (초등) =====
+    const DIRS = { U: [0, -1, '⬆️'], D: [0, 1, '⬇️'], L: [-1, 0, '⬅️'], R: [1, 0, '➡️'] };
+    const maze = { n: 6, walls: new Set(), start: [0, 0], goal: [5, 5], robot: [0, 0], prog: [], trail: [], running: false, shortest: 0 };
+    const cellKey = (x, y) => `${x},${y}`;
+    function shortestPath() {
+        const { n, walls, start, goal } = maze;
+        const dist = { [cellKey(...start)]: 0 }, queue = [start];
+        while (queue.length) {
+            const [x, y] = queue.shift();
+            if (x === goal[0] && y === goal[1]) return dist[cellKey(x, y)];
+            Object.values(DIRS).forEach(([dx, dy]) => {
+                const nx = x + dx, ny = y + dy, k = cellKey(nx, ny);
+                if (nx < 0 || ny < 0 || nx >= n || ny >= n || walls.has(k) || k in dist) return;
+                dist[k] = dist[cellKey(x, y)] + 1;
+                queue.push([nx, ny]);
+            });
+        }
+        return -1;
+    }
+    function newMaze() {
+        const g = +state.grade || 3;
+        const n = g <= 2 ? 5 : g <= 4 ? 6 : 7;
+        const wallCount = Math.round(n * n * (g <= 2 ? 0.2 : 0.28));
+        const ri = k => Math.floor(Math.random() * k);
+        for (let tries = 0; tries < 200; tries++) {
+            maze.n = n;
+            maze.start = [0, ri(n)];
+            maze.goal = [n - 1 - ri(2), ri(n)];
+            maze.walls = new Set();
+            while (maze.walls.size < wallCount) {
+                const x = ri(n), y = ri(n);
+                if ((x === maze.start[0] && y === maze.start[1]) || (x === maze.goal[0] && y === maze.goal[1])) continue;
+                maze.walls.add(cellKey(x, y));
+            }
+            maze.shortest = shortestPath();
+            if (maze.shortest >= n) break;
+        }
+        resetRobot();
+        maze.prog = [];
+        $('code-msg').textContent = '';
+        drawMaze();
+    }
+    function resetRobot() { maze.robot = [...maze.start]; maze.trail = []; }
+    function drawMaze(bump) {
+        const { n, walls, goal, robot, trail } = maze;
+        $('maze').style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+        let html = '';
+        for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+            const k = cellKey(x, y);
+            const isRobot = robot[0] === x && robot[1] === y, isGoal = goal[0] === x && goal[1] === y;
+            const cls = bump === k ? 'bump' : trail.includes(k) ? 'trail' : '';
+            html += `<div class="cell ${cls}">${isRobot ? '🤖' : isGoal ? '⭐' : walls.has(k) ? '🌳' : ''}</div>`;
+        }
+        $('maze').innerHTML = html;
+        drawProgram(-1);
+    }
+    function drawProgram(cur) {
+        $('program').innerHTML = maze.prog.length
+            ? maze.prog.map((c, i) => `<span class="${i === cur ? 'cur' : ''}">${DIRS[c][2]}</span>`).join('')
+            : '<span class="hint" style="font-size:14px">여기에 명령이 쌓여요</span>';
+    }
+    $('code-btns').addEventListener('click', e => {
+        const b = e.target.closest('button[data-cmd]');
+        if (!b || maze.running) return;
+        if (maze.prog.length >= 20) { toast('명령은 20개까지 넣을 수 있어요'); return; }
+        maze.prog.push(b.dataset.cmd);
+        tone(500, 0, 0.08, 'sine', 0.12);
+        drawProgram(-1);
+    });
+    $('btn-code-undo').onclick = () => { if (!maze.running) { maze.prog.pop(); drawProgram(-1); } };
+    $('btn-code-clear').onclick = () => { if (!maze.running) { maze.prog = []; resetRobot(); $('code-msg').textContent = ''; drawMaze(); } };
+    $('btn-code-new').onclick = () => { if (!maze.running) newMaze(); };
+    $('btn-code-run').onclick = () => {
+        if (maze.running) return;
+        if (!maze.prog.length) { toast('먼저 화살표로 명령을 넣어 주세요'); return; }
+        resetRobot();
+        maze.running = true;
+        $('code-msg').textContent = '';
+        let i = 0;
+        const stepOnce = () => {
+            if (i >= maze.prog.length) {
+                maze.running = false;
+                const ok = maze.robot[0] === maze.goal[0] && maze.robot[1] === maze.goal[1];
+                if (ok) {
+                    const best = maze.prog.length <= maze.shortest;
+                    $('code-msg').textContent = `🎉 도착! 명령 ${maze.prog.length}개 사용 (가장 짧은 길: ${maze.shortest}개)` + (best ? ' 최고예요!' : '');
+                    sounds.chime(); if (best) confetti(30);
+                } else {
+                    $('code-msg').textContent = '아직 ⭐에 도착하지 못했어요. 명령을 더 넣어 볼까요?';
+                }
+                return;
+            }
+            const [dx, dy] = DIRS[maze.prog[i]];
+            const nx = maze.robot[0] + dx, ny = maze.robot[1] + dy, k = cellKey(nx, ny);
+            if (nx < 0 || ny < 0 || nx >= maze.n || ny >= maze.n || maze.walls.has(k)) {
+                maze.running = false;
+                drawMaze(nx >= 0 && ny >= 0 && nx < maze.n && ny < maze.n ? k : null);
+                drawProgram(i);
+                $('code-msg').textContent = `💥 ${i + 1}번째 명령에서 부딪혔어요! 어디를 고치면 될까요?`;
+                tone(180, 0, 0.3, 'triangle', 0.2);
+                return;
+            }
+            maze.trail.push(cellKey(...maze.robot));
+            maze.robot = [nx, ny];
+            drawMaze();
+            drawProgram(i);
+            tone(400 + i * 30, 0, 0.1, 'sine', 0.1);
+            i++;
+            setTimeout(stepOnce, 420);
+        };
+        drawMaze();
+        setTimeout(stepOnce, 300);
+    };
+
     // ===== 시작 =====
     function renderAll() {
         renderHeader();
@@ -2080,7 +2313,10 @@
     }
     renderMix();
     newPattern();
+    newMaze();
     renderAll();
+    // 처음 방문했거나 학교급을 아직 고르지 않았다면 시작 화면을 보여 준다
+    if (!state.levelChosen) $('level-pick').classList.add('show');
 </script>
 </body>
 </html>
